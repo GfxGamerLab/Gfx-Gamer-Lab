@@ -4,80 +4,68 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GFX Gamer Lab — Pro Gaming Resources</title>
-<meta name="description" content="GFX Gamer Lab - Your ultimate destination for gaming graphics, GFX tools, gameplay videos, downloads and tutorials.">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="GFX Gamer Lab - Your ultimate destination for PUBG Mobile pro configs, GFX tools & premium gaming resources.">
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GYBMZBBS1W"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GYBMZBBS1W');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#030510;--bg2:#070d1f;--bg3:#0d1530;--neon:#00f0ff;--neon2:#bf00ff;--neon3:#ff006a;--accent:#7b2fff;--gold:#ffd700;--green:#00ff88;--text:#e8eeff;--muted:#6a7a9a;--card:rgba(13,21,48,0.85);--border:rgba(0,240,255,0.15);}
+:root{--bg:#030510;--bg2:#070d1f;--bg3:#0d1530;--neon:#00f0ff;--neon2:#bf00ff;--neon3:#ff006a;--accent:#7b2fff;--gold:#ffd700;--text:#e8eeff;--muted:#6a7a9a;--card:rgba(13,21,48,0.85);--border:rgba(0,240,255,0.15);}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,240,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0;}
 body::after{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(0,240,255,0.05) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(191,0,255,0.07) 0%,transparent 50%);pointer-events:none;z-index:0;}
 /* ADS */
-.ad-top-banner{width:100%;background:rgba(0,240,255,0.05);border-bottom:1px solid var(--border);text-align:center;padding:8px;font-size:12px;color:var(--muted);z-index:10;display:none;}
+.ad-top-banner{width:100%;background:rgba(0,240,255,0.05);border-bottom:1px solid var(--border);text-align:center;padding:8px;position:relative;z-index:10;display:none;}
 .ad-top-banner.active{display:block;}
-.ad-sidebar{min-height:250px;background:rgba(0,240,255,0.03);border:1px solid var(--border);border-radius:8px;display:none;align-items:center;justify-content:center;font-size:11px;color:var(--muted);text-align:center;position:sticky;top:100px;}
+.ad-sidebar{width:160px;min-height:300px;background:rgba(0,240,255,0.03);border:1px solid var(--border);border-radius:8px;display:none;align-items:center;justify-content:center;font-size:11px;color:var(--muted);text-align:center;position:sticky;top:100px;}
 .ad-sidebar.active{display:flex;}
-.ad-in-content{width:100%;min-height:90px;background:rgba(191,0,255,0.05);border:1px solid rgba(191,0,255,0.2);border-radius:8px;display:none;align-items:center;justify-content:center;font-size:12px;color:var(--muted);margin:20px 0;}
+.ad-in-content{width:100%;min-height:90px;background:rgba(191,0,255,0.05);border:1px solid rgba(191,0,255,0.2);border-radius:8px;display:none;align-items:center;justify-content:center;margin:20px 0;}
 .ad-in-content.active{display:flex;}
-.ad-footer{width:100%;min-height:90px;background:rgba(0,240,255,0.03);border-top:1px solid var(--border);display:none;align-items:center;justify-content:center;font-size:12px;color:var(--muted);padding:20px;}
+.ad-footer{width:100%;min-height:90px;background:rgba(0,240,255,0.03);border-top:1px solid var(--border);display:none;align-items:center;justify-content:center;padding:20px;}
 .ad-footer.active{display:flex;}
 /* HEADER */
 header{position:sticky;top:0;z-index:100;background:rgba(3,5,16,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
 .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:16px;}
-.logo-area{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;}
+.logo-area{display:flex;align-items:center;gap:12px;cursor:pointer;}
 .logo-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--neon);box-shadow:0 0 15px rgba(0,240,255,0.4);}
-.logo-placeholder{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--neon2));border:2px solid var(--neon);box-shadow:0 0 15px rgba(0,240,255,0.4);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#fff;}
-.logo-text{font-family:'Orbitron',sans-serif;font-size:clamp(13px,2vw,19px);font-weight:900;background:linear-gradient(90deg,var(--neon),var(--accent),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;line-height:1.1;}
+.logo-placeholder{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--neon2));border:2px solid var(--neon);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#fff;}
+.logo-text{font-family:'Orbitron',sans-serif;font-size:clamp(13px,2vw,19px);font-weight:900;background:linear-gradient(90deg,var(--neon),var(--accent),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;}
 .logo-sub{font-size:10px;color:var(--muted);letter-spacing:3px;}
-nav{display:flex;gap:3px;align-items:center;}
-nav a{color:var(--muted);text-decoration:none;padding:7px 12px;border-radius:6px;font-size:13px;font-weight:600;letter-spacing:1px;transition:all 0.2s;border:1px solid transparent;cursor:pointer;}
+nav{display:flex;gap:4px;align-items:center;}
+nav a{color:var(--muted);text-decoration:none;padding:7px 13px;border-radius:6px;font-size:13px;font-weight:600;letter-spacing:1px;transition:all 0.2s;border:1px solid transparent;}
 nav a:hover,nav a.active{color:var(--neon);border-color:var(--border);background:rgba(0,240,255,0.08);}
-.yt-btn{background:linear-gradient(135deg,#ff0000,#cc0000)!important;color:#fff!important;border:none!important;padding:7px 14px!important;font-weight:700!important;display:flex!important;align-items:center;gap:5px;}
+.yt-btn{background:linear-gradient(135deg,#ff0000,#cc0000)!important;color:#fff!important;border:none!important;}
 .hamburger{display:none;background:none;border:1px solid var(--border);color:var(--neon);padding:8px;border-radius:6px;cursor:pointer;font-size:18px;}
 .mobile-nav{display:none;flex-direction:column;gap:4px;padding:10px 20px 15px;border-top:1px solid var(--border);}
 .mobile-nav.open{display:flex;}
-.mobile-nav a{color:var(--muted);text-decoration:none;padding:10px 14px;border-radius:6px;font-size:15px;font-weight:600;border:1px solid transparent;transition:all 0.2s;cursor:pointer;}
-.mobile-nav a:hover{color:var(--neon);border-color:var(--border);background:rgba(0,240,255,0.08);}
+.mobile-nav a{color:var(--muted);text-decoration:none;padding:10px 14px;border-radius:6px;font-size:15px;font-weight:600;border:1px solid transparent;transition:all 0.2s;}
+.mobile-nav a:hover{color:var(--neon);background:rgba(0,240,255,0.08);}
 /* LAYOUT */
 .page-wrap{max-width:1200px;margin:0 auto;padding:20px;position:relative;z-index:1;}
 .content-sidebar{display:flex;gap:24px;align-items:flex-start;}
 .main-content{flex:1;min-width:0;}
 /* HERO */
-.hero{text-align:center;padding:50px 20px 36px;}
-.hero-badge{display:inline-block;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:var(--neon);padding:5px 16px;border-radius:20px;font-size:11px;letter-spacing:3px;font-weight:700;margin-bottom:20px;animation:pulse 2s infinite;}
+.hero{text-align:center;padding:50px 20px 40px;}
+.hero-badge{display:inline-block;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:var(--neon);padding:5px 16px;border-radius:20px;font-size:12px;letter-spacing:3px;font-weight:700;margin-bottom:20px;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 0 10px rgba(0,240,255,0.3);}50%{box-shadow:0 0 25px rgba(0,240,255,0.6);}}
 .hero h1{font-family:'Orbitron',sans-serif;font-size:clamp(26px,5vw,54px);font-weight:900;background:linear-gradient(135deg,#fff 0%,var(--neon) 50%,var(--neon2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;}
-.hero p{color:var(--muted);font-size:15px;max-width:580px;margin:0 auto 28px;line-height:1.6;}
-.hero-stats{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;}
-.stat{text-align:center;}
-.stat-num{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--neon);display:block;}
-.stat-label{font-size:10px;color:var(--muted);letter-spacing:2px;}
+.hero p{color:var(--muted);font-size:15px;max-width:580px;margin:0 auto 24px;line-height:1.6;}
+.hero-stats{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin-top:16px;}
+.stat{text-align:center;}.stat-num{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--neon);display:block;}.stat-label{font-size:11px;color:var(--muted);letter-spacing:2px;}
+/* VISITOR BADGE - public stats */
+.visitor-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);border-radius:30px;padding:8px 20px;margin:14px auto 0;font-size:13px;color:var(--muted);}
+.visitor-dot{width:8px;height:8px;border-radius:50%;background:var(--neon);animation:pulse 1.5s infinite;}
+.visitor-num{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--neon);font-weight:700;}
+/* TRUST BANNER */
+.trust-banner{background:linear-gradient(135deg,rgba(0,240,255,0.08),rgba(191,0,255,0.08));border:1px solid rgba(0,240,255,0.2);border-radius:12px;padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
+.trust-stars-big{font-size:20px;color:var(--gold);}
+.trust-text{font-size:14px;color:var(--text);font-weight:600;}.trust-count{font-size:12px;color:var(--muted);}
 /* SECTION TITLE */
-.section-title{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
-.section-title h2{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--neon);letter-spacing:2px;}
-/* TRUST BANNER — always visible on homepage */
-.trust-banner{
-  background:linear-gradient(135deg,rgba(0,240,255,0.06),rgba(191,0,255,0.06));
-  border:1px solid rgba(0,240,255,0.2);
-  border-radius:12px;padding:20px 24px;margin-bottom:24px;
-  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-}
-.trust-stars-big{font-size:26px;color:var(--gold);letter-spacing:2px;flex-shrink:0;}
-.trust-info{flex:1;}
-.trust-info h3{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--neon);letter-spacing:2px;margin-bottom:4px;}
-.trust-info p{font-size:12px;color:var(--muted);}
-.trust-avg{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:var(--gold);}
-.trust-count{font-size:12px;color:var(--muted);}
-/* Trust placeholder for external badge */
-.trust-external-slot{
-  background:rgba(0,240,255,0.03);border:2px dashed rgba(0,240,255,0.2);
-  border-radius:10px;padding:16px;text-align:center;
-  font-size:12px;color:var(--muted);margin-bottom:20px;
-  display:none;
-}
-.trust-external-slot.show{display:block;}
+.section-title{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.section-title h2{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:700;color:var(--neon);letter-spacing:2px;}
 /* POSTS GRID */
 .posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;}
 .post-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.3s;position:relative;}
@@ -85,109 +73,112 @@ nav a:hover,nav a.active{color:var(--neon);border-color:var(--border);background
 .post-thumb{width:100%;height:175px;object-fit:cover;display:block;}
 .post-thumb-placeholder{width:100%;height:175px;background:linear-gradient(135deg,var(--bg3),var(--accent));display:flex;align-items:center;justify-content:center;font-size:40px;}
 .post-body{padding:14px;}
-.post-badge{display:inline-block;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:var(--neon);font-size:9px;letter-spacing:2px;padding:2px 7px;border-radius:4px;margin-bottom:7px;font-weight:700;}
-.post-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4;}
-.post-desc{font-size:12px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.post-meta-row{display:flex;gap:12px;margin-top:8px;align-items:center;}
-.view-count,.dl-count{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);font-weight:600;}
-.post-footer{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
-.post-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;cursor:pointer;border:none;transition:all 0.2s;letter-spacing:1px;}
+.post-badge{display:inline-block;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:var(--neon);font-size:10px;letter-spacing:2px;padding:2px 8px;border-radius:4px;margin-bottom:7px;font-weight:700;}
+.post-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:7px;line-height:1.4;}
+.post-desc{font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.post-footer{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center;}
+.post-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;cursor:pointer;border:none;transition:all 0.2s;font-family:'Rajdhani',sans-serif;}
 .btn-download{background:linear-gradient(135deg,var(--neon),var(--accent));color:#000;flex:1;justify-content:center;}
 .btn-tg{background:rgba(0,136,204,0.2);color:#29b5e8;border:1px solid rgba(41,181,232,0.3);}
 .btn-wa{background:rgba(37,211,102,0.15);color:#25d366;border:1px solid rgba(37,211,102,0.3);}
-.new-badge{position:absolute;top:10px;right:10px;background:var(--neon3);color:#fff;font-size:9px;font-weight:700;padding:3px 7px;border-radius:4px;letter-spacing:1px;}
+.btn-like{background:rgba(255,0,106,0.15);color:#ff006a;border:1px solid rgba(255,0,106,0.3);padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:4px;font-family:'Rajdhani',sans-serif;}
+.btn-like.liked{background:rgba(255,0,106,0.35);color:#ff4488;}
+.btn-share{background:rgba(123,47,255,0.2);color:#a060ff;border:1px solid rgba(123,47,255,0.3);padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:'Rajdhani',sans-serif;transition:all 0.2s;}
+.new-badge{position:absolute;top:10px;right:10px;background:var(--neon3);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;}
+.no-posts{text-align:center;padding:60px 20px;color:var(--muted);}.no-posts .icon{font-size:50px;margin-bottom:16px;}
+/* SHARE POPUP */
+.share-popup{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;padding:20px;}
+.share-popup.open{display:flex;}
+.share-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:360px;}
+.share-title{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--neon);margin-bottom:14px;letter-spacing:2px;}
+.share-link-box{display:flex;gap:8px;margin-bottom:14px;}
+.share-link-box input{flex:1;background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:12px;font-family:'Rajdhani',sans-serif;outline:none;}
+.share-copy-btn{background:linear-gradient(135deg,var(--neon),var(--accent));color:#000;border:none;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;}
+.share-btns{display:flex;gap:8px;}
+.share-wa{background:rgba(37,211,102,0.2);color:#25d366;border:1px solid rgba(37,211,102,0.3);padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;flex:1;text-align:center;}
+.share-tg{background:rgba(41,181,232,0.2);color:#29b5e8;border:1px solid rgba(41,181,232,0.3);padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;flex:1;text-align:center;}
+.share-close{background:rgba(255,0,106,0.2);color:#ff006a;border:1px solid rgba(255,0,106,0.3);padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;width:100%;margin-top:8px;}
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.93);display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
-.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;animation:mIn 0.3s ease;}
-@keyframes mIn{from{opacity:0;transform:scale(0.9)translateY(20px);}to{opacity:1;transform:none;}}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:700px;width:100%;max-height:92vh;overflow-y:auto;animation:modalIn 0.3s ease;}
+@keyframes modalIn{from{opacity:0;transform:scale(0.9) translateY(20px);}to{opacity:1;transform:none;}}
 .modal-video-wrap{position:relative;width:100%;background:#000;}
-.modal-video-wrap video{width:100%;max-height:380px;display:block;}
+.modal-video-wrap video{width:100%;max-height:400px;display:block;}
 .modal-video-wrap iframe{width:100%;height:340px;border:none;display:block;}
-.modal-close{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:10;}
-.modal-close:hover{background:var(--neon3);}
+.modal-close{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;z-index:10;}
 .modal-info{padding:18px;}
-.modal-title{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:700;color:#fff;margin-bottom:7px;}
-.modal-stats-row{display:flex;gap:14px;margin-bottom:10px;}
-.modal-stat-item{font-size:12px;color:var(--muted);}
+.modal-title{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;}
 .modal-desc{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px;}
-.modal-actions{display:flex;gap:9px;flex-wrap:wrap;}
-/* Admin Reply */
-.admin-reply-box{background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);border-radius:10px;padding:13px 15px;margin-top:14px;display:flex;gap:11px;align-items:flex-start;}
-.reply-logo{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--neon2));border:2px solid var(--neon);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;font-family:'Orbitron',sans-serif;color:#fff;flex-shrink:0;overflow:hidden;}
-.reply-logo img{width:100%;height:100%;object-fit:cover;}
-.reply-name{font-size:11px;font-weight:700;color:var(--neon);letter-spacing:1px;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
-.reply-badge{background:var(--neon);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;}
-.reply-text{font-size:13px;color:var(--text);line-height:1.5;}
+.modal-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.modal-stats{display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.modal-stat{font-size:13px;color:var(--muted);}.modal-stat span{color:var(--neon);font-weight:700;}
 /* SIDEBAR */
-.sidebar{width:255px;flex-shrink:0;}
+.sidebar{width:250px;flex-shrink:0;}
 .widget{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;}
-.widget-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:var(--neon);letter-spacing:2px;margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--border);}
+.widget-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:var(--neon);letter-spacing:2px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border);}
 .social-links{display:flex;flex-direction:column;gap:7px;}
-.social-link{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;border:1px solid transparent;transition:all 0.2s;color:var(--text);}
+.social-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;border:1px solid transparent;transition:all 0.2s;color:var(--text);}
 .social-link:hover{transform:translateX(4px);}
 .social-link.yt{background:rgba(255,0,0,0.1);border-color:rgba(255,0,0,0.2);color:#ff4444;}
 .social-link.tg{background:rgba(41,181,232,0.1);border-color:rgba(41,181,232,0.2);color:#29b5e8;}
 .social-link.wa{background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.2);color:#25d366;}
 .social-link.fb{background:rgba(24,119,242,0.1);border-color:rgba(24,119,242,0.2);color:#1877f2;}
 .social-link.tt{background:rgba(255,0,80,0.1);border-color:rgba(255,0,80,0.2);color:#ff0050;}
-.trust-section{text-align:center;}
-.trust-stars{font-size:20px;color:var(--gold);margin:7px 0;}
-.trust-link{display:inline-block;color:var(--neon);font-size:12px;text-decoration:none;border:1px solid var(--border);padding:5px 12px;border-radius:6px;margin-top:5px;transition:all 0.2s;}
+.trust-section{text-align:center;}.trust-stars{font-size:22px;color:var(--gold);margin:8px 0;}
+.trust-link{display:inline-block;color:var(--neon);font-size:12px;text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:6px;margin-top:6px;transition:all 0.2s;}
 /* PAGES */
 .page{display:none;}.page.active{display:block;}
 .about-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:26px;margin-bottom:18px;}
 .about-section h3{font-family:'Orbitron',sans-serif;font-size:15px;color:var(--neon);margin-bottom:12px;}
-.about-section p{color:var(--muted);line-height:1.8;font-size:14px;}
+.about-section p{color:var(--muted);line-height:1.8;font-size:15px;}
 .tutorial-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text);transition:all 0.2s;}
 .tutorial-card:hover{border-color:var(--neon);transform:translateX(4px);}
-.tutorial-icon{width:46px;height:46px;border-radius:8px;background:linear-gradient(135deg,#ff0000,#990000);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.tutorial-info h4{font-size:14px;font-weight:700;margin-bottom:3px;}
-.tutorial-info p{font-size:12px;color:var(--muted);}
-.privacy-content{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:26px;color:var(--muted);line-height:1.9;font-size:14px;}
-/* FEEDBACK PAGE */
-.feedback-form{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:26px;max-width:580px;margin-bottom:30px;}
+.tutorial-icon{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#ff0000,#990000);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.privacy-content{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;color:var(--muted);line-height:1.9;font-size:15px;}
+.privacy-content h3{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--neon);margin:18px 0 8px;}
+.feedback-form{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;max-width:580px;}
 .form-group{margin-bottom:16px;}
-.form-group label{display:block;font-size:12px;font-weight:600;color:var(--neon);letter-spacing:1px;margin-bottom:7px;}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--neon);letter-spacing:1px;margin-bottom:7px;}
 .form-group input,.form-group textarea,.form-group select{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 13px;font-size:14px;font-family:'Rajdhani',sans-serif;outline:none;transition:border-color 0.2s;}
 .form-group input:focus,.form-group textarea:focus{border-color:var(--neon);}
 .form-group textarea{resize:vertical;min-height:110px;}
-.submit-btn{background:linear-gradient(135deg,var(--neon),var(--accent));color:#000;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'Rajdhani',sans-serif;transition:all 0.2s;}
+.submit-btn{background:linear-gradient(135deg,var(--neon),var(--accent));color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;transition:all 0.2s;}
 .submit-btn:hover{box-shadow:0 6px 25px rgba(0,240,255,0.4);}
-.success-msg{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00ff88;padding:12px;border-radius:8px;font-size:13px;margin-top:12px;display:none;}
-/* FEEDBACK PUBLIC LIST */
-.fb-list-title{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--neon);letter-spacing:2px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.fb-pub-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:11px;}
-.fb-pub-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
-.fb-pub-name{font-weight:700;font-size:14px;}
-.fb-pub-stars{color:var(--gold);font-size:13px;}
-.fb-pub-text{color:var(--muted);font-size:13px;line-height:1.6;}
-.fb-admin-reply{margin-top:11px;background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.15);border-radius:8px;padding:11px 13px;display:flex;gap:9px;align-items:flex-start;}
-.fb-reply-logo{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--neon2));border:1px solid var(--neon);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;color:#fff;overflow:hidden;}
-.fb-reply-logo img{width:100%;height:100%;object-fit:cover;}
-.fb-reply-name{font-size:11px;font-weight:700;color:var(--neon);margin-bottom:2px;display:flex;align-items:center;gap:4px;}
-.fb-reply-badge{background:var(--neon);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;}
-.fb-reply-text{font-size:12px;color:var(--text);line-height:1.5;}
+.success-msg{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00ff88;padding:12px;border-radius:8px;font-size:14px;margin-top:12px;display:none;}
+.fb-item{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.fb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.fb-name{font-weight:700;font-size:15px;}.fb-stars{color:var(--gold);}
+.fb-text{color:var(--muted);font-size:13px;line-height:1.6;}
+.admin-reply{background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.2);border-radius:8px;padding:10px;margin-top:8px;}
+.admin-badge{background:var(--neon);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;}
 /* FOOTER */
 footer{margin-top:50px;position:relative;z-index:1;border-top:1px solid var(--border);background:rgba(3,5,16,0.9);padding:36px 20px 18px;}
 .footer-inner{max-width:1200px;margin:0 auto;}
 .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:26px;margin-bottom:26px;}
 .footer-col h4{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--neon);letter-spacing:2px;margin-bottom:12px;}
-.footer-col p,.footer-col a{font-size:12px;color:var(--muted);text-decoration:none;display:block;margin-bottom:7px;line-height:1.6;cursor:pointer;transition:color 0.2s;}
+.footer-col p,.footer-col a{font-size:13px;color:var(--muted);text-decoration:none;display:block;margin-bottom:7px;line-height:1.6;transition:color 0.2s;}
 .footer-col a:hover{color:var(--neon);}
-.footer-bottom{border-top:1px solid var(--border);padding-top:18px;text-align:center;font-size:12px;color:var(--muted);}
-.seo-section{background:rgba(0,240,255,0.03);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:18px;font-size:11px;color:var(--muted);line-height:1.7;display:none;}
+.footer-bottom{border-top:1px solid var(--border);padding-top:16px;text-align:center;font-size:12px;color:var(--muted);}
+.seo-section{font-size:12px;color:var(--muted);line-height:1.7;margin-top:16px;padding:12px;background:rgba(0,240,255,0.02);border-radius:8px;display:none;}
 .seo-section.active{display:block;}
-.scroll-top{position:fixed;bottom:22px;right:22px;z-index:500;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--neon),var(--accent));border:none;cursor:pointer;color:#000;font-size:18px;box-shadow:0 4px 20px rgba(0,240,255,0.4);display:none;align-items:center;justify-content:center;transition:all 0.2s;}
+/* LOADING */
+.loading{text-align:center;padding:40px;color:var(--muted);}
+.loading-spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.4);color:#00ff88;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+.scroll-top{position:fixed;bottom:22px;right:22px;z-index:500;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--neon),var(--accent));border:none;cursor:pointer;color:#000;font-size:17px;display:none;align-items:center;justify-content:center;}
 .scroll-top.show{display:flex;}
-.no-posts{text-align:center;padding:50px 20px;color:var(--muted);}
-.no-posts .icon{font-size:46px;margin-bottom:14px;}
-@media(max-width:768px){nav{display:none;}.hamburger{display:block;}.content-sidebar{flex-direction:column;}.sidebar{width:100%;}.posts-grid{grid-template-columns:1fr;}.hero{padding:28px 10px 20px;}.ad-sidebar{display:none!important;}}
-@media(max-width:480px){.header-inner{padding:10px 14px;}.logo-text{font-size:12px;letter-spacing:1px;}}
+@media(max-width:768px){nav{display:none;}.hamburger{display:block;}.content-sidebar{flex-direction:column;}.sidebar{width:100%;}.posts-grid{grid-template-columns:1fr;}.hero{padding:30px 10px 20px;}.ad-sidebar{display:none!important;}}
+@media(max-width:480px){.header-inner{padding:10px 13px;}.logo-text{font-size:12px;}}
 </style>
 </head>
 <body>
+
 <div class="ad-top-banner" id="adTopBanner"></div>
+
 <header>
   <div class="header-inner">
     <div class="logo-area" onclick="showPage('home')">
@@ -195,87 +186,87 @@ footer{margin-top:50px;position:relative;z-index:1;border-top:1px solid var(--bo
       <div><div class="logo-text">GFX GAMER LAB</div><div class="logo-sub">PRO GAMING RESOURCES</div></div>
     </div>
     <nav id="mainNav">
-      <a class="active" onclick="showPage('home');setActive(this)">HOME</a>
-      <a onclick="showPage('about');setActive(this)">ABOUT</a>
-      <a onclick="showPage('tutorials');setActive(this)">TUTORIALS</a>
-      <a onclick="showPage('privacy');setActive(this)">PRIVACY</a>
-      <a onclick="showPage('feedback');setActive(this)">FEEDBACK</a>
-      <a class="yt-btn" id="ytHeaderBtn" style="display:none" target="_blank">▶ YouTube</a>
+      <a href="#" class="active" onclick="showPage('home');setActive(this)">HOME</a>
+      <a href="#" onclick="showPage('about');setActive(this)">ABOUT</a>
+      <a href="#" onclick="showPage('tutorials');setActive(this)">TUTORIALS</a>
+      <a href="#" onclick="showPage('privacy');setActive(this)">PRIVACY</a>
+      <a href="#" onclick="showPage('feedback');setActive(this)">FEEDBACK</a>
+      <a href="#" class="yt-btn" id="ytHeaderBtn" style="display:none;" target="_blank">▶ YouTube</a>
     </nav>
     <button class="hamburger" onclick="toggleMobile()">☰</button>
   </div>
   <div class="mobile-nav" id="mobileNav">
-    <a onclick="showPage('home');toggleMobile()">🏠 HOME</a>
-    <a onclick="showPage('about');toggleMobile()">ℹ️ ABOUT</a>
-    <a onclick="showPage('tutorials');toggleMobile()">🎬 TUTORIALS</a>
-    <a onclick="showPage('privacy');toggleMobile()">🔒 PRIVACY</a>
-    <a onclick="showPage('feedback');toggleMobile()">💬 FEEDBACK</a>
-    <a id="ytMobileBtn" style="display:none" target="_blank">▶ YouTube</a>
+    <a href="#" onclick="showPage('home');toggleMobile()">🏠 HOME</a>
+    <a href="#" onclick="showPage('about');toggleMobile()">ℹ️ ABOUT</a>
+    <a href="#" onclick="showPage('tutorials');toggleMobile()">🎬 TUTORIALS</a>
+    <a href="#" onclick="showPage('privacy');toggleMobile()">🔒 PRIVACY</a>
+    <a href="#" onclick="showPage('feedback');toggleMobile()">💬 FEEDBACK</a>
+    <a href="#" id="ytMobileBtn" style="display:none;" target="_blank">▶ YouTube</a>
   </div>
 </header>
+
 <div class="page-wrap">
   <div class="content-sidebar">
     <div class="main-content">
-      <!-- HOME PAGE -->
+
+      <!-- HOME -->
       <div class="page active" id="page-home">
         <div class="hero">
           <div class="hero-badge">⚡ GAMING RESOURCES</div>
           <h1>GFX GAMER LAB</h1>
-          <p id="heroDesc">Your ultimate destination for professional gaming graphics, GFX tools, gameplay videos and premium downloads.</p>
+          <p id="heroDesc">Your ultimate destination for PUBG Mobile pro configs, GFX tools & premium gaming resources. Level up your gameplay — for free! ⚡</p>
           <div class="hero-stats">
             <div class="stat"><span class="stat-num" id="statPosts">0</span><span class="stat-label">POSTS</span></div>
-            <div class="stat"><span class="stat-num" id="statViews">0</span><span class="stat-label">TOTAL VIEWS</span></div>
-            <div class="stat"><span class="stat-num" id="statDl">0</span><span class="stat-label">DOWNLOADS</span></div>
+            <div class="stat"><span class="stat-num">PRO</span><span class="stat-label">QUALITY</span></div>
+            <div class="stat"><span class="stat-num">FREE</span><span class="stat-label">DOWNLOADS</span></div>
+          </div>
+          <!-- PUBLIC VISITOR STATS -->
+          <div class="visitor-badge">
+            <span class="visitor-dot"></span>
+            <span><span class="visitor-num" id="publicTodayVisitors">...</span> visitors today</span>
+            &nbsp;|&nbsp;
+            <span><span class="visitor-num" id="publicMonthVisitors">...</span> this month</span>
           </div>
         </div>
-        <!-- TRUST BANNER — always shows real feedback stars -->
-        <div class="trust-banner" id="trustBanner">
-          <div class="trust-stars-big" id="trustStarsBig">★★★★★</div>
-          <div class="trust-info">
-            <h3>⭐ COMMUNITY TRUST RATING</h3>
-            <p id="trustSummary">Be the first to share your experience!</p>
-          </div>
-          <div style="text-align:center">
-            <div class="trust-avg" id="trustAvgNum">—</div>
-            <div class="trust-count" id="trustTotalCount">0 reviews</div>
-          </div>
+
+        <div class="trust-banner" id="trustBanner" style="display:none;">
+          <div class="trust-stars-big" id="trustStarsBig">⭐⭐⭐⭐⭐</div>
+          <div><div class="trust-text" id="trustRatingText">5.0 / 5.0 Rating</div><div class="trust-count" id="trustReviewCount">0 reviews</div></div>
         </div>
-        <!-- External trust badge slot (future use) -->
-        <div class="trust-external-slot" id="trustExternalSlot" id="extTrustSlot">
-          <!-- Professional trust badge will appear here -->
-        </div>
+
+        <!-- IN-CONTENT AD -->
         <div class="ad-in-content" id="adInContent"></div>
+
         <div class="section-title"><span>🎮</span><h2>LATEST POSTS</h2></div>
-        <div class="posts-grid" id="postsGrid"><div class="no-posts"><div class="icon">🎮</div><p>No posts yet. Check back soon!</p></div></div>
+        <div id="postsGrid"><div class="loading"><div class="loading-spinner"></div><p>Loading posts...</p></div></div>
       </div>
-      <!-- ABOUT PAGE -->
+
+      <!-- ABOUT -->
       <div class="page" id="page-about">
         <div class="section-title"><span>ℹ️</span><h2>ABOUT US</h2></div>
-        <div class="about-section"><h3>🎮 About GFX Gamer Lab</h3><p id="aboutText">GFX Gamer Lab is your ultimate destination for professional gaming graphics, GFX tools, gameplay videos, and premium downloads.</p></div>
-        <div class="about-section">
-          <h3>📺 Our YouTube Channel</h3>
-          <p id="aboutYtText">Visit our YouTube channel for tutorials, gameplay videos, and gaming tips.</p><br>
-          <a href="#" id="aboutYtBtn" class="yt-btn" target="_blank" style="display:inline-flex;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;align-items:center;gap:8px;font-family:Rajdhani,sans-serif;">▶ Visit Our Channel</a>
-        </div>
+        <div class="about-section"><h3>🎮 About GFX Gamer Lab</h3><p id="aboutText">Loading...</p></div>
+        <div class="about-section"><h3>📺 Our YouTube Channel</h3><p id="aboutYtText">Visit our YouTube channel for tutorials and gaming tips.</p><br><a href="#" id="aboutYtBtn" class="yt-btn" target="_blank" style="display:inline-flex;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;align-items:center;gap:8px;font-family:Rajdhani,sans-serif;font-size:14px;">▶ Visit Our Channel</a></div>
       </div>
-      <!-- TUTORIALS PAGE -->
+
+      <!-- TUTORIALS -->
       <div class="page" id="page-tutorials">
         <div class="section-title"><span>🎬</span><h2>TUTORIALS</h2></div>
-        <div id="tutorialsList"><div class="no-posts"><div class="icon">🎬</div><p>No tutorials yet.</p></div></div>
+        <div id="tutorialsList"><div class="loading"><div class="loading-spinner"></div></div></div>
       </div>
-      <!-- PRIVACY PAGE -->
+
+      <!-- PRIVACY -->
       <div class="page" id="page-privacy">
         <div class="section-title"><span>🔒</span><h2>PRIVACY POLICY</h2></div>
-        <div class="privacy-content" id="privacyContent"><p>Privacy policy content will be added soon.</p></div>
+        <div class="privacy-content" id="privacyContent"><p>Loading...</p></div>
       </div>
-      <!-- FEEDBACK PAGE -->
+
+      <!-- FEEDBACK -->
       <div class="page" id="page-feedback">
         <div class="section-title"><span>💬</span><h2>FEEDBACK</h2></div>
         <div class="feedback-form">
           <div class="form-group"><label>YOUR NAME</label><input type="text" id="fbName" placeholder="Enter your name"></div>
-          <div class="form-group"><label>YOUR FEEDBACK</label><textarea id="fbText" placeholder="Share your thoughts, suggestions..."></textarea></div>
-          <div class="form-group">
-            <label>RATING</label>
+          <div class="form-group"><label>YOUR FEEDBACK</label><textarea id="fbText" placeholder="Share your thoughts..."></textarea></div>
+          <div class="form-group"><label>RATING</label>
             <select id="fbRating">
               <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
               <option value="4">⭐⭐⭐⭐ Good</option>
@@ -285,277 +276,267 @@ footer{margin-top:50px;position:relative;z-index:1;border-top:1px solid var(--bo
             </select>
           </div>
           <button class="submit-btn" onclick="submitFeedback()">SEND FEEDBACK ➤</button>
-          <div class="success-msg" id="fbSuccess">✅ Thank you! Your feedback has been submitted.</div>
+          <div class="success-msg" id="fbSuccess">✅ Thank you! Feedback submitted.</div>
         </div>
-        <!-- PUBLIC FEEDBACK LIST WITH ADMIN REPLIES -->
-        <div id="publicFeedbackList"></div>
+        <div id="feedbackListPublic" style="margin-top:24px;"></div>
       </div>
+
     </div>
+
     <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="ad-sidebar" id="adSidebar"></div>
-      <div class="widget" id="followWidget" style="display:none"><div class="widget-title">📱 FOLLOW US</div><div class="social-links" id="socialLinks"></div></div>
-      <div class="widget" id="contactWidget" style="display:none"><div class="widget-title">📞 CONTACT US</div><div class="contact-links" id="contactLinks"></div></div>
-      <!-- SIDEBAR TRUST WIDGET -->
-      <div class="widget" id="trustSideWidget">
-        <div class="widget-title">⭐ TRUST RATING</div>
-        <div class="trust-section">
-          <div class="trust-stars" id="sidebarStars">★★★★★</div>
-          <div style="font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--gold)" id="sidebarAvg">—</div>
-          <p style="font-size:11px;color:var(--muted)" id="sidebarReviews">0 reviews</p>
-          <a href="#" class="trust-link" id="trustExtLink" target="_blank" style="display:none">🔗 Verified Badge</a>
-        </div>
-      </div>
+      <div class="widget" id="followWidget" style="display:none;"><div class="widget-title">📱 FOLLOW US</div><div class="social-links" id="socialLinks"></div></div>
+      <div class="widget" id="contactWidget" style="display:none;"><div class="widget-title">📞 CONTACT US</div><div class="social-links" id="contactLinks"></div></div>
+      <div class="widget" id="trustWidget" style="display:none;"><div class="widget-title">⭐ TRUST RATING</div><div class="trust-section"><div class="trust-stars" id="sidebarStars">★★★★★</div><p style="font-size:12px;color:var(--muted);" id="sidebarRatingText">Verified & Trusted</p><a href="#" class="trust-link" id="trustLink" target="_blank">View Verification</a></div></div>
     </div>
   </div>
 </div>
+
 <div class="page-wrap"><div class="seo-section" id="seoSection"></div></div>
 <div class="ad-footer" id="adFooter"></div>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-col"><h4>GFX GAMER LAB</h4><p>Professional gaming resources, GFX tools and premium downloads for gamers.</p></div>
-      <div class="footer-col"><h4>QUICK LINKS</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('about')">About Us</a><a onclick="showPage('tutorials')">Tutorials</a><a onclick="showPage('privacy')">Privacy Policy</a><a onclick="showPage('feedback')">Feedback</a></div>
+      <div class="footer-col"><h4>QUICK LINKS</h4><a href="#" onclick="showPage('home')">Home</a><a href="#" onclick="showPage('about')">About Us</a><a href="#" onclick="showPage('tutorials')">Tutorials</a><a href="#" onclick="showPage('privacy')">Privacy Policy</a><a href="#" onclick="showPage('feedback')">Feedback</a></div>
       <div class="footer-col" id="footerSocial"><h4>FOLLOW US</h4></div>
     </div>
     <div class="footer-bottom"><p>© 2024 GFX Gamer Lab. All Rights Reserved. | Made with ❤️ for Gamers</p></div>
   </div>
 </footer>
+
 <!-- VIDEO MODAL -->
 <div class="modal-overlay" id="videoModal" onclick="closeModal(event)">
   <div class="modal-box">
     <div class="modal-video-wrap" id="modalVideoWrap"><button class="modal-close" onclick="closeModalDirect()">✕</button></div>
     <div class="modal-info">
       <div class="modal-title" id="modalTitle"></div>
-      <div class="modal-stats-row">
-        <div class="modal-stat-item">👁️ <span id="modalViews">0</span> views</div>
-        <div class="modal-stat-item">⬇️ <span id="modalDl">0</span> downloads</div>
-      </div>
       <div class="modal-desc" id="modalDesc"></div>
       <div class="modal-actions" id="modalActions"></div>
-      <div id="modalReply"></div>
+      <div class="modal-stats" id="modalStats"></div>
     </div>
   </div>
 </div>
+
+<!-- SHARE POPUP -->
+<div class="share-popup" id="sharePopup">
+  <div class="share-box">
+    <div class="share-title">🔗 SHARE THIS POST</div>
+    <div class="share-link-box"><input type="text" id="shareLinkInput" readonly><button class="share-copy-btn" onclick="copyShareLink()">COPY</button></div>
+    <div class="share-btns"><button class="share-wa" onclick="shareWhatsApp()">📲 WhatsApp</button><button class="share-tg" onclick="shareTelegram()">✈ Telegram</button></div>
+    <button class="share-close" onclick="closeShare()">✕ CLOSE</button>
+  </div>
+</div>
+
 <button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="toast" id="toast"></div>
+
 <script>
-function getData(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
-function setData(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-function fmtNum(n){if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'K';return String(n);}
+const SUPABASE_URL='https://clvmcoaufhmqkflolmtw.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsdm1jb2F1ZmhtcWtmbG9sbXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MDQyNzAsImV4cCI6MjA4ODQ4MDI3MH0.kdua1_V2WCVAM7BoEODP8jGIq1NJqQ4T0BwHwAxlDc4';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// ANALYTICS
-function trackVisit(){
-  const d=getData('gfx_analytics',{totalVisits:0,todayVisits:0,lastDate:'',sources:{direct:0,search:0,social:0,referral:0}});
-  const today=new Date().toDateString();
-  if(d.lastDate!==today){d.todayVisits=0;d.lastDate=today;}
-  d.totalVisits++;d.todayVisits++;
-  const ref=document.referrer||'';
-  let src='direct';
-  if(/google|bing|yahoo|duckduckgo/.test(ref))src='search';
-  else if(/facebook|instagram|twitter|tiktok|whatsapp|telegram/.test(ref))src='social';
-  else if(ref)src='referral';
-  d.sources[src]=(d.sources[src]||0)+1;
-  setData('gfx_analytics',d);
-  if(typeof gtag!=='undefined')gtag('event','page_view',{page_title:'GFX Gamer Lab'});
-}
-function trackPostView(id){
-  if(sessionStorage.getItem('v_'+id))return;
-  sessionStorage.setItem('v_'+id,'1');
-  const v=getData('gfx_post_views',{});
-  v[id]=(v[id]||0)+1;
-  setData('gfx_post_views',v);
-  if(typeof gtag!=='undefined')gtag('event','post_view',{event_category:'engagement',event_label:id});
-}
-function trackDownload(id){
-  const d=getData('gfx_post_downloads',{});
-  d[id]=(d[id]||0)+1;
-  setData('gfx_post_downloads',d);
-  if(typeof gtag!=='undefined')gtag('event','download',{event_category:'conversion',event_label:id});
-}
-trackVisit();
+function getLocal(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
+function setLocal(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
-// TRUST RATING
-function updateTrustDisplay(){
-  const fbs=getData('gfx_feedbacks',[]);
-  if(!fbs.length)return;
-  const avg=(fbs.reduce((s,f)=>s+parseInt(f.rating||5),0)/fbs.length);
-  const avgFixed=avg.toFixed(1);
-  const fullStars=Math.round(avg);
-  const stars='★'.repeat(fullStars)+'☆'.repeat(5-fullStars);
-  const el1=document.getElementById('trustStarsBig');
-  const el2=document.getElementById('trustSummary');
-  const el3=document.getElementById('trustAvgNum');
-  const el4=document.getElementById('trustTotalCount');
-  const el5=document.getElementById('sidebarStars');
-  const el6=document.getElementById('sidebarAvg');
-  const el7=document.getElementById('sidebarReviews');
-  if(el1)el1.textContent=stars;
-  if(el2)el2.textContent=fbs.length+' gamers have rated this website';
-  if(el3)el3.textContent=avgFixed+' / 5';
-  if(el4)el4.textContent=fbs.length+' reviews';
-  if(el5)el5.textContent=stars;
-  if(el6)el6.textContent=avgFixed;
-  if(el7)el7.textContent=fbs.length+' reviews';
+// ===== ANALYTICS TRACKING =====
+async function trackVisit(){
+  try{
+    const now=new Date();
+    const dateStr=now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const monthStr=now.toISOString().slice(0,7);   // YYYY-MM
+    const device=window.innerWidth<768?'mobile':'desktop';
+    const page=window.location.pathname||'/';
+    // Unique session per day
+    const sessionKey='gfx_visited_'+dateStr;
+    if(sessionStorage.getItem(sessionKey))return; // Already tracked this session today
+    sessionStorage.setItem(sessionKey,'1');
+    await sb.from('analytics').insert([{
+      id:Date.now().toString()+Math.random().toString(36).slice(2),
+      date:dateStr,
+      month:monthStr,
+      country:'Unknown',
+      device:device,
+      page:page,
+      created_at:Date.now()
+    }]);
+  }catch(e){console.log('Analytics track error',e);}
 }
 
-// NAV
+async function loadPublicVisitorStats(){
+  try{
+    const now=new Date();
+    const today=now.toISOString().split('T')[0];
+    const thisMonth=now.toISOString().slice(0,7);
+    const {data:todayData}=await sb.from('analytics').select('id').eq('date',today);
+    const {data:monthData}=await sb.from('analytics').select('id').eq('month',thisMonth);
+    document.getElementById('publicTodayVisitors').textContent=(todayData?.length||0).toLocaleString();
+    document.getElementById('publicMonthVisitors').textContent=(monthData?.length||0).toLocaleString();
+  }catch(e){
+    document.getElementById('publicTodayVisitors').textContent='0';
+    document.getElementById('publicMonthVisitors').textContent='0';
+  }
+}
+
+// ===== NAV =====
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const pg=document.getElementById('page-'+id);
-  if(pg)pg.classList.add('active');
+  document.getElementById('page-'+id)?.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
-  if(id==='feedback')renderPublicFeedback();
+  if(id==='feedback')loadPublicFeedback();
+  if(id==='tutorials')loadTutorials();
 }
 function setActive(el){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));el.classList.add('active');}
 function toggleMobile(){document.getElementById('mobileNav').classList.toggle('open');}
 
-// INIT
-function initSite(){
-  const settings=getData('gfx_settings',{});
-  const posts=getData('gfx_posts',[]);
-  const socials=getData('gfx_socials',{});
-  const contacts=getData('gfx_contacts',{});
-  const tutorials=getData('gfx_tutorials',[]);
-  const views=getData('gfx_post_views',{});
-  const downloads=getData('gfx_post_downloads',{});
+// ===== LIKES =====
+function getLikedPosts(){return getLocal('gfx_liked_posts',[]);}
+function isLiked(id){return getLikedPosts().includes(String(id));}
+function addLike(id){const l=getLikedPosts();if(!l.includes(String(id))){l.push(String(id));setLocal('gfx_liked_posts',l);}}
 
-  if(settings.logoImg){
-    document.getElementById('headerLogoImg').outerHTML=`<img src="${settings.logoImg}" class="logo-img" id="headerLogoImg" alt="Logo">`;
-  }
-  const tv=Object.values(views).reduce((a,b)=>a+b,0);
-  const td=Object.values(downloads).reduce((a,b)=>a+b,0);
-  document.getElementById('statPosts').textContent=posts.length;
-  document.getElementById('statViews').textContent=fmtNum(tv);
-  document.getElementById('statDl').textContent=fmtNum(td);
+// ===== SETTINGS =====
+async function loadSettings(){
+  try{
+    const {data}=await sb.from('settings').select('*');
+    if(!data)return;
+    const s={};
+    data.forEach(row=>{
+      // Support both old format (key/value) and new format
+      if(row.key)s[row.key]=row.value;
+    });
 
-  if(settings.heroDesc)document.getElementById('heroDesc').textContent=settings.heroDesc;
-  if(settings.aboutText)document.getElementById('aboutText').textContent=settings.aboutText;
-  if(settings.aboutYtText)document.getElementById('aboutYtText').textContent=settings.aboutYtText;
-  if(settings.privacyText)document.getElementById('privacyContent').innerHTML=settings.privacyText;
-  if(settings.seoText){const s=document.getElementById('seoSection');s.textContent=settings.seoText;s.classList.add('active');}
+    if(s.logoImg){const el=document.getElementById('headerLogoImg');el.outerHTML=`<img src="${s.logoImg}" class="logo-img" id="headerLogoImg" alt="Logo">`;}
+    if(s.heroDesc)document.getElementById('heroDesc').textContent=s.heroDesc;
+    if(s.aboutText)document.getElementById('aboutText').textContent=s.aboutText;
+    if(s.aboutYtText)document.getElementById('aboutYtText').textContent=s.aboutYtText;
+    if(s.privacyText)document.getElementById('privacyContent').innerHTML=s.privacyText;
+    if(s.seoText){const sec=document.getElementById('seoSection');sec.textContent=s.seoText;sec.classList.add('active');}
+    if(s.trustLink){document.getElementById('trustWidget').style.display='block';document.getElementById('trustLink').href=s.trustLink;}
 
-  // External trust badge (future)
-  if(settings.trustBadgeCode){
-    const sl=document.getElementById('trustExternalSlot');
-    if(sl){sl.innerHTML=settings.trustBadgeCode;sl.classList.add('show');}
-  }
-  if(settings.trustExtLink){
-    const tl=document.getElementById('trustExtLink');
-    if(tl){tl.href=settings.trustExtLink;tl.style.display='inline-block';}
-  }
+    // ADS — only show if toggled on
+    if(s.adTop){const el=document.getElementById('adTopBanner');el.innerHTML=s.adTop;el.classList.add('active');}
+    if(s.adSidebar){const el=document.getElementById('adSidebar');el.innerHTML=s.adSidebar;el.classList.add('active');}
+    if(s.adInContent){const el=document.getElementById('adInContent');el.innerHTML=s.adInContent;el.classList.add('active');}
+    if(s.adFooter){const el=document.getElementById('adFooter');el.innerHTML=s.adFooter;el.classList.add('active');}
 
-  // YouTube
-  if(socials.youtube){
-    ['ytHeaderBtn','ytMobileBtn'].forEach(id=>{const el=document.getElementById(id);if(el){el.href=socials.youtube;el.style.display='inline-flex';}});
-    const ab=document.getElementById('aboutYtBtn');if(ab)ab.href=socials.youtube;
-  }
+    // Socials
+    const socialMap=[{key:'youtube',label:'YouTube',cls:'yt',icon:'▶'},{key:'telegram',label:'Telegram',cls:'tg',icon:'✈'},{key:'whatsapp',label:'WhatsApp',cls:'wa',icon:'💬'},{key:'facebook',label:'Facebook',cls:'fb',icon:'f'},{key:'tiktok',label:'TikTok',cls:'tt',icon:'♪'}];
+    const sl=document.getElementById('socialLinks');const fsDiv=document.getElementById('footerSocial');let hasSocial=false;
+    socialMap.forEach(sm=>{
+      if(s[sm.key]){
+        hasSocial=true;
+        sl.innerHTML+=`<a href="${s[sm.key]}" class="social-link ${sm.cls}" target="_blank"><span>${sm.icon}</span>${sm.label}</a>`;
+        fsDiv.innerHTML+=`<a href="${s[sm.key]}" target="_blank">${sm.icon} ${sm.label}</a>`;
+        if(sm.key==='youtube'){['ytHeaderBtn','ytMobileBtn'].forEach(id=>{const el=document.getElementById(id);if(el){el.href=s[sm.key];el.style.display='inline-flex';}});const ab=document.getElementById('aboutYtBtn');if(ab)ab.href=s[sm.key];}
+      }
+    });
+    if(hasSocial)document.getElementById('followWidget').style.display='block';
 
-  // Socials
-  const socialMap=[{key:'youtube',label:'YouTube',cls:'yt',icon:'▶'},{key:'telegram',label:'Telegram',cls:'tg',icon:'✈'},{key:'whatsapp',label:'WhatsApp',cls:'wa',icon:'💬'},{key:'facebook',label:'Facebook',cls:'fb',icon:'f'},{key:'tiktok',label:'TikTok',cls:'tt',icon:'♪'}];
-  const sl=document.getElementById('socialLinks');
-  const fw=document.getElementById('followWidget');
-  const fs=document.getElementById('footerSocial');
-  let hasSocial=false;
-  socialMap.forEach(s=>{
-    if(socials[s.key]){
-      hasSocial=true;
-      sl.innerHTML+=`<a href="${socials[s.key]}" class="social-link ${s.cls}" target="_blank"><span>${s.icon}</span>${s.label}</a>`;
-      fs.innerHTML+=`<a href="${socials[s.key]}" target="_blank">${s.icon} ${s.label}</a>`;
-    }
-  });
-  if(hasSocial)fw.style.display='block';
-
-  // Contacts
-  const cl=document.getElementById('contactLinks');
-  const cw=document.getElementById('contactWidget');
-  let hasC=false;
-  if(contacts.telegram){hasC=true;cl.innerHTML+=`<a href="${contacts.telegram}" class="social-link tg" target="_blank"><span>✈</span>Telegram Group</a>`;}
-  if(contacts.facebook){hasC=true;cl.innerHTML+=`<a href="${contacts.facebook}" class="social-link fb" target="_blank"><span>f</span>Facebook Page</a>`;}
-  if(hasC)cw.style.display='block';
-
-  // Ads
-  const adEl=(id,code)=>{if(code){const e=document.getElementById(id);e.innerHTML=code;e.classList.add('active');}};
-  adEl('adTopBanner',settings.adTop);
-  adEl('adSidebar',settings.adSidebar);
-  adEl('adInContent',settings.adInContent);
-  adEl('adFooter',settings.adFooter);
-
-  renderPosts(posts,views,downloads,settings);
-  renderTutorials(tutorials);
-  updateTrustDisplay();
+    // Contacts
+    const cl=document.getElementById('contactLinks');let hasContact=false;
+    if(s.contactTelegram){hasContact=true;cl.innerHTML+=`<a href="${s.contactTelegram}" class="social-link tg" target="_blank"><span>✈</span>Telegram Group</a>`;}
+    if(s.contactFacebook){hasContact=true;cl.innerHTML+=`<a href="${s.contactFacebook}" class="social-link fb" target="_blank"><span>f</span>Facebook</a>`;}
+    if(hasContact)document.getElementById('contactWidget').style.display='block';
+  }catch(e){console.log('Settings error',e);}
 }
 
-function renderPosts(posts,views,downloads,settings){
+// ===== POSTS =====
+async function loadPosts(){
   const grid=document.getElementById('postsGrid');
-  if(!posts||!posts.length){grid.innerHTML='<div class="no-posts"><div class="icon">🎮</div><p>No posts yet. Check back soon!</p></div>';return;}
-  const sorted=[...posts].sort((a,b)=>b.createdAt-a.createdAt);
-  grid.innerHTML=sorted.map((p,i)=>{
-    const isNew=i<3?'<span class="new-badge">NEW</span>':'';
-    const thumb=p.thumbnail?`<img src="${p.thumbnail}" class="post-thumb" alt="${p.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=post-thumb-placeholder>🎮</div>'">`:`<div class="post-thumb-placeholder">🎮</div>`;
-    const v=views[p.id]||0,dl=downloads[p.id]||0;
-    let acts='';
-    if(p.downloadLink)acts+=`<a href="${p.downloadLink}" class="post-btn btn-download" target="_blank" onclick="trackDownload('${p.id}');event.stopPropagation()">⬇ DOWNLOAD</a>`;
-    if(p.telegramLink)acts+=`<a href="${p.telegramLink}" class="post-btn btn-tg" target="_blank" onclick="event.stopPropagation()">✈</a>`;
-    if(p.whatsappLink)acts+=`<a href="${p.whatsappLink}" class="post-btn btn-wa" target="_blank" onclick="event.stopPropagation()">💬</a>`;
-    const hasVid=p.videoUrl||p.videoEmbed;
-    const pJson=JSON.stringify(p).replace(/\\/g,'\\\\').replace(/"/g,'&quot;');
-    return `<div class="post-card" onclick="openPost(JSON.parse(this.dataset.p))" data-p="${pJson}">
-      ${isNew}${thumb}
-      <div class="post-body">
-        <div class="post-badge">🎮 ${hasVid?'VIDEO POST':'POST'}</div>
-        <div class="post-title">${p.title||'Untitled'}</div>
-        ${p.description?`<div class="post-desc">${p.description}</div>`:''}
-        <div class="post-meta-row">
-          <div class="view-count">👁️ ${fmtNum(v)}</div>
-          ${dl>0?`<div class="dl-count">⬇️ ${fmtNum(dl)}</div>`:''}
-        </div>
-        <div class="post-footer">${acts}</div>
-      </div>
-    </div>`;
-  }).join('');
+  try{
+    const {data:posts,error}=await sb.from('posts').select('*').order('created_at',{ascending:false});
+    if(error||!posts?.length){grid.innerHTML='<div class="no-posts"><div class="icon">🎮</div><p>No posts yet. Check back soon!</p></div>';return;}
+    document.getElementById('statPosts').textContent=posts.length;
+    grid.innerHTML='<div class="posts-grid">'+posts.map((p,i)=>{
+      const isNew=i<3?'<span class="new-badge">NEW</span>':'';
+      const thumb=p.thumbnail?`<img src="${p.thumbnail}" class="post-thumb" alt="${p.title}" onerror="this.style.display='none'">`:`<div class="post-thumb-placeholder">🎮</div>`;
+      const liked=isLiked(p.id);
+      let actions='';
+      if(p.download_link)actions+=`<a href="${p.download_link}" class="post-btn btn-download" target="_blank" onclick="event.stopPropagation()">⬇ DOWNLOAD</a>`;
+      if(p.telegram_link)actions+=`<a href="${p.telegram_link}" class="post-btn btn-tg" target="_blank" onclick="event.stopPropagation()">✈</a>`;
+      if(p.whatsapp_link)actions+=`<a href="${p.whatsapp_link}" class="post-btn btn-wa" target="_blank" onclick="event.stopPropagation()">💬</a>`;
+      actions+=`<button class="btn-like${liked?' liked':''}" id="like-${p.id}" onclick="likePost(event,'${p.id}')">❤ <span id="lc-${p.id}">${p.likes||0}</span></button>`;
+      actions+=`<button class="btn-share" onclick="openShare(event,'${p.id}','${(p.title||'').replace(/'/g,String.fromCharCode(39))}')">🔗</button>`;
+      const desc=p.description?`<div class="post-desc">${p.description}</div>`:'';
+      const pJ=JSON.stringify(p).replace(/"/g,'&quot;');
+      return `<div class="post-card" onclick="openPost(${pJ})">${isNew}${thumb}<div class="post-body"><div class="post-badge">${(p.video_url||p.video_embed)?'🎬 VIDEO':'🎮 POST'}</div><div class="post-title">${p.title||'Untitled'}</div>${desc}<div class="post-footer">${actions}</div></div></div>`;
+    }).join('')+'</div>';
+  }catch(e){grid.innerHTML='<div class="no-posts"><div class="icon">⚠️</div><p>Error loading. Please refresh.</p></div>';}
 }
 
-function renderTutorials(t){
+// ===== TUTORIALS =====
+async function loadTutorials(){
   const el=document.getElementById('tutorialsList');
-  if(!t||!t.length){el.innerHTML='<div class="no-posts"><div class="icon">🎬</div><p>No tutorials yet.</p></div>';return;}
-  el.innerHTML=t.map(x=>`<a href="${x.link}" class="tutorial-card" target="_blank"><div class="tutorial-icon">▶</div><div class="tutorial-info"><h4>${x.title}</h4><p>YouTube Tutorial</p></div></a>`).join('');
+  try{
+    const {data}=await sb.from('tutorials').select('*').order('created_at',{ascending:false});
+    if(!data?.length){el.innerHTML='<div class="no-posts"><div class="icon">🎬</div><p>No tutorials yet.</p></div>';return;}
+    el.innerHTML=data.map(t=>`<a href="${t.link}" class="tutorial-card" target="_blank"><div class="tutorial-icon">▶</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:4px;">${t.title}</h4><p style="font-size:12px;color:var(--muted);">YouTube Tutorial</p></div></a>`).join('');
+  }catch(e){el.innerHTML='<p style="color:var(--muted);">Error loading.</p>';}
 }
 
-// MODAL
+// ===== FEEDBACK =====
+async function loadPublicFeedback(){
+  const el=document.getElementById('feedbackListPublic');
+  try{
+    const {data}=await sb.from('feedbacks').select('*').order('date',{ascending:false});
+    if(!data?.length){el.innerHTML='';return;}
+    const avg=(data.reduce((s,f)=>s+(parseInt(f.rating)||0),0)/data.length).toFixed(1);
+    document.getElementById('trustBanner').style.display='flex';
+    document.getElementById('trustStarsBig').textContent='⭐'.repeat(Math.round(avg));
+    document.getElementById('trustRatingText').textContent=`${avg} / 5.0 Rating`;
+    document.getElementById('trustReviewCount').textContent=`${data.length} reviews`;
+    document.getElementById('sidebarStars').textContent='★'.repeat(Math.round(avg));
+    document.getElementById('sidebarRatingText').textContent=`${avg}/5 (${data.length} reviews)`;
+    el.innerHTML='<div class="section-title"><span>💬</span><h2>REVIEWS</h2></div>'+data.map(f=>{
+      const stars='⭐'.repeat(parseInt(f.rating)||0);
+      const date=new Date(f.date).toLocaleDateString();
+      const reply=f.admin_reply?`<div class="admin-reply"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><span class="admin-badge">ADMIN</span></div><div style="font-size:13px;color:var(--text);">${f.admin_reply}</div></div>`:'';
+      return `<div class="fb-item"><div class="fb-header"><span class="fb-name">${f.name||'Anonymous'}</span><span class="fb-stars">${stars}</span></div><div class="fb-text">${f.text}</div><div style="font-size:11px;color:var(--muted);margin-top:5px;">${date}</div>${reply}</div>`;
+    }).join('');
+  }catch(e){}
+}
+
+async function submitFeedback(){
+  const name=document.getElementById('fbName').value.trim();
+  const text=document.getElementById('fbText').value.trim();
+  const rating=parseInt(document.getElementById('fbRating').value);
+  if(!text){alert('Please write your feedback!');return;}
+  await sb.from('feedbacks').insert([{id:Date.now().toString(),name:name||'Anonymous',text,rating,date:Date.now()}]);
+  document.getElementById('fbSuccess').style.display='block';
+  document.getElementById('fbName').value='';document.getElementById('fbText').value='';
+  setTimeout(()=>document.getElementById('fbSuccess').style.display='none',4000);
+  loadPublicFeedback();
+}
+
+// ===== MODAL =====
 function openPost(post){
-  trackPostView(post.id);
-  const views=getData('gfx_post_views',{});
-  const dls=getData('gfx_post_downloads',{});
-  const settings=getData('gfx_settings',{});
-  const replies=getData('gfx_post_replies',{});
   const wrap=document.getElementById('modalVideoWrap');
   document.getElementById('modalTitle').textContent=post.title||'';
   document.getElementById('modalDesc').textContent=post.description||'';
-  document.getElementById('modalViews').textContent=fmtNum(views[post.id]||0);
-  document.getElementById('modalDl').textContent=fmtNum(dls[post.id]||0);
-  let vid='<button class="modal-close" onclick="closeModalDirect()">✕</button>';
-  if(post.videoUrl){
-    vid+=`<video autoplay muted playsinline controls style="width:100%;max-height:380px;display:block"><source src="${post.videoUrl}"></video>`;
-  } else if(post.videoEmbed){
-    let src=post.videoEmbed;
+  let html='<button class="modal-close" onclick="closeModalDirect()">✕</button>';
+  if(post.video_url){
+    html+=`<video autoplay muted playsinline controls style="width:100%;max-height:400px;display:block;"><source src="${post.video_url}"></video>`;
+  }else if(post.video_embed){
+    let src=post.video_embed;
     if(src.includes('youtube.com/watch'))src=src.replace('watch?v=','embed/')+'?autoplay=1&mute=1';
-    else if(src.includes('youtu.be/'))src='https://www.youtube.com/embed/'+src.split('youtu.be/')[1]+'?autoplay=1&mute=1';
-    vid+=`<iframe src="${src}" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="width:100%;height:340px;display:block"></iframe>`;
-  } else if(post.thumbnail){
-    vid+=`<img src="${post.thumbnail}" style="width:100%;max-height:340px;object-fit:cover;display:block">`;
+    else if(src.includes('youtu.be/'))src='https://www.youtube.com/embed/'+src.split('youtu.be/')[1].split('?')[0]+'?autoplay=1&mute=1';
+    html+=`<iframe src="${src}" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="width:100%;height:340px;"></iframe>`;
+  }else if(post.thumbnail){
+    html+=`<img src="${post.thumbnail}" style="width:100%;max-height:340px;object-fit:cover;display:block;">`;
   }
-  wrap.innerHTML=vid;
+  wrap.innerHTML=html;
+  const liked=isLiked(post.id);
   let acts='';
-  if(post.downloadLink)acts+=`<a href="${post.downloadLink}" class="post-btn btn-download" target="_blank" onclick="trackDownload('${post.id}')" style="flex:1">⬇ DOWNLOAD</a>`;
-  if(post.telegramLink)acts+=`<a href="${post.telegramLink}" class="post-btn btn-tg" target="_blank">✈ Telegram</a>`;
-  if(post.whatsappLink)acts+=`<a href="${post.whatsappLink}" class="post-btn btn-wa" target="_blank">💬 WhatsApp</a>`;
+  if(post.download_link)acts+=`<a href="${post.download_link}" class="post-btn btn-download" target="_blank" style="flex:1;">⬇ DOWNLOAD</a>`;
+  if(post.telegram_link)acts+=`<a href="${post.telegram_link}" class="post-btn btn-tg" target="_blank">✈ Telegram</a>`;
+  if(post.whatsapp_link)acts+=`<a href="${post.whatsapp_link}" class="post-btn btn-wa" target="_blank">💬 WhatsApp</a>`;
+  acts+=`<button class="btn-like${liked?' liked':''}" id="modal-like-${post.id}" onclick="likePost(event,'${post.id}')">❤ <span id="modal-lc-${post.id}">${post.likes||0}</span> Likes</button>`;
+  acts+=`<button class="btn-share" onclick="openShare(event,'${post.id}','${(post.title||'').replace(/'/g,String.fromCharCode(39))}')">🔗 Share</button>`;
   document.getElementById('modalActions').innerHTML=acts;
-  const replyEl=document.getElementById('modalReply');
-  const reply=replies[post.id];
-  if(reply){
-    const logo=settings.logoImg?`<img src="${settings.logoImg}" alt="">`:'G';
-    replyEl.innerHTML=`<div class="admin-reply-box"><div class="reply-logo">${logo}</div><div><div class="reply-name">GFX GAMER LAB <span class="reply-badge">ADMIN</span></div><div class="reply-text">${reply}</div></div></div>`;
-  } else replyEl.innerHTML='';
+  document.getElementById('modalStats').innerHTML=`<div class="modal-stat">❤ <span id="ms-likes">${post.likes||0}</span> Likes</div>`;
   document.getElementById('videoModal').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -566,44 +547,46 @@ function closeModalDirect(){
   document.getElementById('modalVideoWrap').querySelectorAll('video,iframe').forEach(v=>{v.src='';});
 }
 
-// FEEDBACK
-function submitFeedback(){
-  const name=document.getElementById('fbName').value.trim();
-  const text=document.getElementById('fbText').value.trim();
-  const rating=document.getElementById('fbRating').value;
-  if(!text){alert('Please write your feedback!');return;}
-  const fbs=getData('gfx_feedbacks',[]);
-  fbs.unshift({id:Date.now().toString(),name:name||'Anonymous',text,rating,date:Date.now()});
-  setData('gfx_feedbacks',fbs);
-  document.getElementById('fbSuccess').style.display='block';
-  document.getElementById('fbName').value='';
-  document.getElementById('fbText').value='';
-  setTimeout(()=>document.getElementById('fbSuccess').style.display='none',4000);
-  renderPublicFeedback();
-  updateTrustDisplay();
-  if(typeof gtag!=='undefined')gtag('event','feedback_submit',{event_category:'engagement'});
+// ===== LIKE =====
+async function likePost(e,id){
+  e.stopPropagation();
+  if(isLiked(id)){showToast('Already liked! ❤');return;}
+  addLike(id);
+  document.querySelectorAll(`#like-${id},#modal-like-${id}`).forEach(b=>b.classList.add('liked'));
+  const {data}=await sb.from('posts').select('likes').eq('id',id).single();
+  const nl=(data?.likes||0)+1;
+  await sb.from('posts').update({likes:nl}).eq('id',id);
+  document.querySelectorAll(`#lc-${id},#modal-lc-${id},#ms-likes`).forEach(el=>el.textContent=nl);
+  showToast('❤ Liked!');
 }
 
-function renderPublicFeedback(){
-  const fbs=getData('gfx_feedbacks',[]);
-  const replies=getData('gfx_feedback_replies',{});
-  const settings=getData('gfx_settings',{});
-  const el=document.getElementById('publicFeedbackList');
-  if(!el)return;
-  if(!fbs.length){el.innerHTML='';return;}
-  const stars=n=>'★'.repeat(parseInt(n))+'☆'.repeat(5-parseInt(n));
-  el.innerHTML=`<div class="fb-list-title">💬 COMMUNITY FEEDBACK (${fbs.length})</div>`+
-  fbs.map(f=>{
-    const logo=settings.logoImg?`<img src="${settings.logoImg}" alt="">`:'G';
-    const reply=replies[f.id];
-    const replyHtml=reply?`<div class="fb-admin-reply"><div class="fb-reply-logo">${logo}</div><div><div class="fb-reply-name">GFX GAMER LAB <span class="fb-reply-badge">ADMIN</span></div><div class="fb-reply-text">${reply}</div></div></div>`:'';
-    return `<div class="fb-pub-item"><div class="fb-pub-header"><span class="fb-pub-name">${f.name}</span><span class="fb-pub-stars">${stars(f.rating)}</span></div><div class="fb-pub-text">${f.text}</div>${replyHtml}</div>`;
-  }).join('');
+// ===== SHARE =====
+let curShare=null;
+function openShare(e,id,title){e.stopPropagation();curShare={id,title};document.getElementById('shareLinkInput').value=`${location.origin}${location.pathname}?post=${id}`;document.getElementById('sharePopup').classList.add('open');}
+function closeShare(){document.getElementById('sharePopup').classList.remove('open');}
+function copyShareLink(){const i=document.getElementById('shareLinkInput');i.select();try{navigator.clipboard.writeText(i.value).then(()=>showToast('✅ Link copied!'));}catch(e){document.execCommand('copy');showToast('✅ Link copied!');}}
+function shareWhatsApp(){window.open(`https://wa.me/?text=${encodeURIComponent('🎮 '+(curShare?.title||'')+'\n'+document.getElementById('shareLinkInput').value)}`,'_blank');}
+function shareTelegram(){window.open(`https://t.me/share/url?url=${encodeURIComponent(document.getElementById('shareLinkInput').value)}&text=${encodeURIComponent('🎮 '+(curShare?.title||''))}`,'_blank');}
+
+// ===== SCROLL =====
+window.addEventListener('scroll',()=>document.getElementById('scrollTopBtn').classList.toggle('show',scrollY>300));
+
+// ===== SHARED POST =====
+async function checkSharedPost(){
+  const postId=new URLSearchParams(location.search).get('post');
+  if(postId){const {data}=await sb.from('posts').select('*').eq('id',postId).single();if(data)setTimeout(()=>openPost(data),600);}
 }
 
-window.addEventListener('scroll',()=>document.getElementById('scrollTopBtn').classList.toggle('show',window.scrollY>300));
-window.addEventListener('storage',()=>{initSite();});
-initSite();
+// ===== INIT =====
+async function init(){
+  trackVisit();
+  loadPublicVisitorStats();
+  await loadSettings();
+  await loadPosts();
+  loadPublicFeedback();
+  checkSharedPost();
+}
+init();
 </script>
 </body>
 </html>
