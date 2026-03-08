@@ -453,12 +453,12 @@ async function savePost(){
   if(!title){toast('Please enter a title!',true);return;}
   const editId=document.getElementById('editPostId').value;
   const btn=document.getElementById('savePostBtn');btn.textContent='⏳ Saving...';btn.disabled=true;
-  const post={id:editId||Date.now().toString(),title,description:document.getElementById('pDesc').value.trim()||null,thumbnail:document.getElementById('pThumbnail').value||null,video_url:document.getElementById('pVideoUrl').value||null,video_embed:document.getElementById('pVideoEmbed').value.trim()||null,download_link:document.getElementById('pDownload').value.trim()||null,telegram_link:document.getElementById('pTelegram').value.trim()||null,whatsapp_link:document.getElementById('pWhatsApp').value.trim()||null};
-  if(!editId){post.created_at=Date.now();post.likes=0;}
+  const postData={title,description:document.getElementById('pDesc').value.trim()||null,thumbnail:document.getElementById('pThumbnail').value||null,video_url:document.getElementById('pVideoUrl').value||null,video_embed:document.getElementById('pVideoEmbed').value.trim()||null,download_link:document.getElementById('pDownload').value.trim()||null,telegram_link:document.getElementById('pTelegram').value.trim()||null,whatsapp_link:document.getElementById('pWhatsApp').value.trim()||null};
+  if(!editId){postData.created_at=Date.now();postData.likes=0;}
   try{
     let err;
-    if(editId){const r=await sb.from('posts').update(post).eq('id',editId);err=r.error;}
-    else{const r=await sb.from('posts').insert([post]);err=r.error;}
+    if(editId){const r=await sb.from('posts').update(postData).eq('id',editId);err=r.error;}
+    else{const r=await sb.from('posts').insert([postData]);err=r.error;}
     if(err)throw err;
     clearPostForm();toast(editId?'✅ Updated!':'✅ Post saved!');switchTab('manageposts');
   }catch(e){toast('❌ Error: '+e.message,true);}
@@ -497,7 +497,7 @@ async function saveTutorial(){
   const title=document.getElementById('tutTitle').value.trim();const link=document.getElementById('tutLink').value.trim();
   if(!title||!link){toast('Fill title and link!',true);return;}
   const editId=document.getElementById('editTutId').value;
-  const tut={id:editId||Date.now().toString(),title,link,created_at:Date.now()};
+  const tut={title,link,created_at:Date.now()};
   if(editId){await sb.from('tutorials').update(tut).eq('id',editId);}else{await sb.from('tutorials').insert([tut]);}
   document.getElementById('tutTitle').value='';document.getElementById('tutLink').value='';document.getElementById('editTutId').value='';
   renderTutorialsList();toast('✅ Tutorial saved!');
@@ -570,7 +570,7 @@ async function renderFeedbackList(){
 }
 async function saveReply(id){await sb.from('feedbacks').update({admin_reply:document.getElementById('reply-'+id).value.trim()||null}).eq('id',id);toast('✅ Reply saved!');renderFeedbackList();}
 async function deleteFeedback(id){if(!confirm('Delete?'))return;await sb.from('feedbacks').delete().eq('id',id);renderFeedbackList();toast('🗑️ Deleted!');}
-async function clearAllFeedback(){if(!confirm('Delete ALL feedback?'))return;await sb.from('feedbacks').delete().neq('id','');renderFeedbackList();toast('🗑️ Cleared!');}
+async function clearAllFeedback(){if(!confirm('Delete ALL feedback?'))return;await sb.from('feedbacks').delete().gt('id',0);renderFeedbackList();toast('🗑️ Cleared!');}
 
 // ANALYTICS
 async function loadAnalytics(){
@@ -619,7 +619,7 @@ async function loadAnalytics(){
   }catch(e){console.log('Analytics error',e);}
 }
 
-async function clearAnalytics(){if(!confirm('Clear all analytics data?'))return;await sb.from('analytics').delete().neq('id','');loadAnalytics();toast('🗑️ Analytics cleared!');}
+async function clearAnalytics(){if(!confirm('Clear all analytics data?'))return;await sb.from('analytics').delete().gt('id',0);loadAnalytics();toast('🗑️ Analytics cleared!');}
 
 // DASHBOARD
 async function refreshDash(){
