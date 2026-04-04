@@ -1,882 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GFX Gamer Lab — Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--bg:#030510;--bg2:#070d1f;--bg3:#0d1530;--neon:#00f0ff;--neon2:#bf00ff;--neon3:#ff006a;--accent:#7b2fff;--gold:#ffd700;--green:#00ff88;--text:#e8eeff;--muted:#6a7a9a;--card:rgba(13,21,48,0.9);--border:rgba(0,240,255,0.15);--danger:#ff3355;--warn:#ffaa00;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,240,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0;}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1;}
-.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px;text-align:center;}
-.login-logo{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;background:linear-gradient(90deg,var(--neon),var(--accent),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:5px;}
-.login-sub{color:var(--muted);font-size:12px;letter-spacing:3px;margin-bottom:28px;}
-.login-box input{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:12px 15px;font-size:15px;font-family:'Rajdhani',sans-serif;outline:none;margin-bottom:12px;transition:border-color 0.2s;}
-.login-box input:focus{border-color:var(--neon);}
-.login-btn{width:100%;background:linear-gradient(135deg,var(--neon),var(--accent));color:#000;border:none;padding:13px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;letter-spacing:2px;}
-.login-error{color:var(--neon3);font-size:13px;margin-top:10px;display:none;}
-#adminPanel{display:none;min-height:100vh;position:relative;z-index:1;}
-.admin-header{background:rgba(3,5,16,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:13px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.admin-logo{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.admin-btns{display:flex;gap:8px;align-items:center;}
-.header-btn{background:rgba(0,240,255,0.1);border:1px solid var(--border);color:var(--neon);padding:7px 13px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;letter-spacing:1px;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
-.header-btn.danger{color:var(--danger);border-color:rgba(255,51,85,0.3);}
-.sidebar-toggle{display:none;background:none;border:1px solid var(--border);color:var(--neon);padding:7px 10px;border-radius:6px;cursor:pointer;font-size:16px;}
-.admin-wrap{display:flex;min-height:calc(100vh - 58px);}
-.admin-sidebar{width:215px;flex-shrink:0;background:rgba(7,13,31,0.9);border-right:1px solid var(--border);padding:16px 0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);transition:all 0.2s;border-left:3px solid transparent;}
-.nav-item:hover{color:var(--text);background:rgba(0,240,255,0.05);}
-.nav-item.active{color:var(--neon);border-left-color:var(--neon);background:rgba(0,240,255,0.08);}
-.nav-icon{font-size:17px;}
-.admin-content{flex:1;padding:22px;overflow-y:auto;}
-.section-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:18px;}
-.section-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--neon);letter-spacing:2px;margin-bottom:18px;padding-bottom:11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.tab-content{display:none;}.tab-content.active{display:block;}
-.form-group{margin-bottom:13px;}
-.form-group label{display:block;font-size:11px;font-weight:700;color:var(--neon);letter-spacing:1px;margin-bottom:6px;}
-.form-group input,.form-group textarea,.form-group select{width:100%;background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 13px;font-size:14px;font-family:'Rajdhani',sans-serif;outline:none;transition:border-color 0.2s;}
-.form-group input:focus,.form-group textarea:focus{border-color:var(--neon);}
-.form-group textarea{resize:vertical;min-height:90px;}
-.form-group small{color:var(--muted);font-size:11px;display:block;margin-top:3px;}
-.optional-tag{background:rgba(255,170,0,0.15);border:1px solid rgba(255,170,0,0.3);color:var(--warn);font-size:10px;padding:1px 6px;border-radius:4px;margin-left:5px;}
-.collapsible{background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.1);border-radius:8px;overflow:hidden;margin-bottom:12px;}
-.collapsible-header{padding:11px 15px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;color:var(--muted);}
-.collapsible-body{padding:15px;border-top:1px solid rgba(0,240,255,0.1);display:none;}
-.collapsible-body.open{display:block;}
-.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Rajdhani',sans-serif;letter-spacing:1px;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
-.btn-primary{background:linear-gradient(135deg,var(--neon),var(--accent));color:#000;}
-.btn-primary:hover{box-shadow:0 4px 20px rgba(0,240,255,0.4);}
-.btn-success{background:rgba(0,255,136,0.2);color:var(--green);border:1px solid rgba(0,255,136,0.3);}
-.btn-danger{background:rgba(255,51,85,0.2);color:var(--danger);border:1px solid rgba(255,51,85,0.3);}
-.btn-edit{background:rgba(255,170,0,0.2);color:var(--warn);border:1px solid rgba(255,170,0,0.3);}
-.btn-sm{padding:5px 11px;font-size:11px;}
-.img-upload-area{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;}
-.img-upload-area:hover{border-color:var(--neon);background:rgba(0,240,255,0.04);}
-.img-preview{width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-top:10px;display:none;}
-.upload-icon{font-size:28px;margin-bottom:7px;}.upload-text{color:var(--muted);font-size:13px;}
-.video-upload-area{border:2px dashed rgba(191,0,255,0.3);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(191,0,255,0.03);}
-.video-upload-area:hover{border-color:var(--neon2);}
-.video-progress{width:100%;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;margin-top:10px;display:none;}
-.video-progress-bar{height:100%;background:linear-gradient(90deg,var(--neon),var(--accent));border-radius:3px;transition:width 0.3s;width:0%;}
-.video-preview-wrap{margin-top:10px;display:none;}
-.video-preview-wrap video{width:100%;max-height:180px;border-radius:8px;}
-.post-item{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;gap:12px;}
-.post-item-thumb{width:75px;height:56px;border-radius:6px;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;}
-.post-item-thumb img{width:100%;height:100%;object-fit:cover;}
-.post-item-info{flex:1;min-width:0;}
-.post-item-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;}
-.post-item-meta{font-size:11px;color:var(--muted);}
-.post-item-actions{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
-/* ANALYTICS */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:18px;}
-.stat-card{background:rgba(0,240,255,0.05);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
-.stat-num{font-family:'Orbitron',sans-serif;font-size:26px;color:var(--neon);font-weight:900;}.stat-label{font-size:11px;color:var(--muted);margin-top:4px;}
-.analytics-chart{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;}
-.analytics-chart h4{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--neon);letter-spacing:2px;margin-bottom:14px;}
-.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;}
-.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
-.bar{width:100%;background:linear-gradient(180deg,var(--neon),var(--accent));border-radius:4px 4px 0 0;min-height:4px;transition:height 0.5s;}
-.bar-label{font-size:10px;color:var(--muted);text-align:center;word-break:break-all;}
-.bar-val{font-size:10px;color:var(--neon);font-weight:700;}
-.device-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
-.device-row:last-child{border:none;}
-.device-name{width:100px;font-size:13px;font-weight:600;}
-.device-bar-wrap{flex:1;background:rgba(255,255,255,0.05);border-radius:4px;height:10px;overflow:hidden;}
-.device-bar{height:100%;background:linear-gradient(90deg,var(--neon),var(--accent));border-radius:4px;transition:width 0.5s;}
-.device-count{width:50px;text-align:right;font-size:13px;color:var(--neon);font-weight:700;}
-.recent-table{width:100%;border-collapse:collapse;font-size:13px;}
-.recent-table th{text-align:left;padding:8px 10px;color:var(--muted);font-size:11px;letter-spacing:1px;border-bottom:1px solid var(--border);}
-.recent-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.04);}
-.recent-table tr:hover td{background:rgba(0,240,255,0.03);}
-/* FEEDBACK */
-.fb-item{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
-.fb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
-.fb-name{font-weight:700;font-size:14px;}.fb-stars{color:var(--gold);}
-.fb-text{color:var(--muted);font-size:13px;line-height:1.5;}
-.fb-reply-area{margin-top:8px;}
-.fb-reply-area textarea{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px;font-size:13px;font-family:'Rajdhani',sans-serif;outline:none;resize:vertical;min-height:65px;}
-.admin-reply-shown{background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.2);border-radius:8px;padding:9px;margin-top:7px;}
-.admin-badge{background:var(--neon);color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;}
-/* TOGGLE */
-.toggle-wrap{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.toggle{width:44px;height:22px;background:rgba(255,255,255,0.1);border-radius:11px;cursor:pointer;position:relative;border:1px solid var(--border);transition:background 0.3s;flex-shrink:0;}
-.toggle.on{background:var(--neon);}
-.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#000;transition:left 0.3s;}
-.toggle.on::after{left:24px;}
-.toggle-label{font-size:13px;color:var(--muted);}
-.loading{text-align:center;padding:28px;color:var(--muted);}
-.loading-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.4);color:var(--green);padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
-.toast.show{opacity:1;}.toast.error{background:rgba(255,51,85,0.15);border-color:rgba(255,51,85,0.4);color:var(--danger);}
-/* TOP POSTS TABLE */
-.top-post-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
-.top-post-row:last-child{border:none;}
-.top-rank{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--neon);width:24px;font-weight:900;}
-.top-title{flex:1;font-size:13px;font-weight:600;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
-.top-val{font-size:12px;color:var(--neon);font-weight:700;white-space:nowrap;}
-@media(max-width:700px){.admin-sidebar{position:fixed;left:-215px;top:58px;z-index:200;height:calc(100vh - 58px);transition:left 0.3s;}.admin-sidebar.open{left:0;}.sidebar-toggle{display:block;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFX Gamer Lab — Admin Panel</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --danger: #ff4757;
+            --success: #26de81;
+            --warning: #feca57;
+            --dark: #1a1f3a;
+            --card-bg: #242b4a;
+            --bg: #0f1422;
+            --text: #fff;
+            --text-muted: #8b92b0;
+            --border: #2d3561;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: var(--dark);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        .error-msg {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        /* Admin Panel */
+        .admin-container {
+            display: none;
+        }
+        
+        /* Header */
+        .admin-header {
+            background: var(--card-bg);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .admin-title h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        /* Sidebar */
+        .admin-layout {
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: var(--card-bg);
+            min-height: calc(100vh - 70px);
+            border-right: 2px solid var(--border);
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-nav li {
+            padding: 0;
+        }
+        
+        .sidebar-nav a {
+            display: block;
+            padding: 15px 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--dark);
+            color: var(--text);
+            border-left-color: var(--primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        /* Charts */
+        .chart-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container h3 {
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        table thead {
+            background: var(--dark);
+        }
+        
+        table th,
+        table td {
+            padding: 15px;
+            text-align: left;
+        }
+        
+        table tbody tr {
+            border-bottom: 1px solid var(--border);
+        }
+        
+        table tbody tr:hover {
+            background: var(--dark);
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .card h3 {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            display: inline-block;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--border);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        
+        input:checked + .toggle-slider {
+            background: var(--success);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Image Upload */
+        .image-upload {
+            border: 2px dashed var(--border);
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .image-upload:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .image-preview {
+            margin-top: 15px;
+        }
+        
+        .image-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+        }
+        
+        /* Post List */
+        .post-item {
+            background: var(--dark);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .post-info h4 {
+            margin-bottom: 5px;
+        }
+        
+        .post-meta {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
-
-<div class="login-wrap" id="loginWrap">
-  <div class="login-box">
-    <div class="login-logo">GFX GAMER LAB</div>
-    <div class="login-sub">ADMIN PANEL</div>
-    <input type="text" id="loginUser" placeholder="Username / Email" autocomplete="off">
-    <input type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">LOGIN ➤</button>
-    <div class="login-error" id="loginError">❌ Wrong username or password!</div>
-  </div>
-</div>
-
-<div id="adminPanel">
-  <div class="admin-header">
-    <div class="admin-logo">⚡ ADMIN PANEL</div>
-    <div class="admin-btns">
-      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
-      <a href="index.html" target="_blank" class="header-btn">🌐 View Site</a>
-      <button class="header-btn danger" onclick="doLogout()">🚪 Logout</button>
-    </div>
-  </div>
-
-  <div class="admin-wrap">
-    <div class="admin-sidebar" id="adminSidebar">
-      <div class="nav-item active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
-      <div class="nav-item" onclick="switchTab('analytics')"><span class="nav-icon">📈</span>Analytics</div>
-      <div class="nav-item" onclick="switchTab('addpost')"><span class="nav-icon">➕</span>Add Post</div>
-      <div class="nav-item" onclick="switchTab('manageposts')"><span class="nav-icon">📋</span>Manage Posts</div>
-      <div class="nav-item" onclick="switchTab('tutorials')"><span class="nav-icon">🎬</span>Tutorials</div>
-      <div class="nav-item" onclick="switchTab('socials')"><span class="nav-icon">📱</span>Social Links</div>
-      <div class="nav-item" onclick="switchTab('contact')"><span class="nav-icon">📞</span>Contact Us</div>
-      <div class="nav-item" onclick="switchTab('ads')"><span class="nav-icon">📢</span>Ads</div>
-      <div class="nav-item" onclick="switchTab('seo')"><span class="nav-icon">🔍</span>SEO</div>
-      <div class="nav-item" onclick="switchTab('feedback')"><span class="nav-icon">💬</span>Feedback</div>
-      <div class="nav-item" onclick="switchTab('settings')"><span class="nav-icon">⚙️</span>Settings</div>
-    </div>
-
-    <div class="admin-content">
-
-      <!-- DASHBOARD -->
-      <div class="tab-content active" id="tab-dashboard">
-        <div class="section-title">📊 DASHBOARD</div>
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-num" id="dash-posts">0</div><div class="stat-label">POSTS</div></div>
-          <div class="stat-card"><div class="stat-num" id="dash-tutorials">0</div><div class="stat-label">TUTORIALS</div></div>
-          <div class="stat-card"><div class="stat-num" id="dash-feedback">0</div><div class="stat-label">FEEDBACK</div></div>
-          <div class="stat-card"><div class="stat-num" id="dash-likes">0</div><div class="stat-label">TOTAL LIKES</div></div>
-          <div class="stat-card"><div class="stat-num" id="dash-today">0</div><div class="stat-label">TODAY VISITS</div></div>
-          <div class="stat-card"><div class="stat-num" id="dash-month">0</div><div class="stat-label">MONTH VISITS</div></div>
-          <div class="stat-card"><div class="stat-num" id="dash-total">0</div><div class="stat-label">TOTAL VISITS</div></div>
-          <div class="stat-card"><div class="stat-num" id="dash-downloads">0</div><div class="stat-label">DOWNLOADS</div></div>
-        </div>
-        <div class="section-card">
-          <div class="section-title">🚀 QUICK ACTIONS</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="switchTab('addpost')">➕ Add Post</button>
-            <button class="btn btn-success" onclick="switchTab('manageposts')">📋 Manage Posts</button>
-            <button class="btn btn-edit" onclick="switchTab('analytics')">📈 Analytics</button>
-            <button class="btn btn-edit" onclick="switchTab('feedback')">💬 Feedback</button>
-            <button class="btn btn-edit" onclick="switchTab('seo')">🔍 SEO</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ANALYTICS -->
-      <div class="tab-content" id="tab-analytics">
-        <div class="section-title">📈 FULL ANALYTICS</div>
-
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-num" id="an-today">0</div><div class="stat-label">TODAY</div></div>
-          <div class="stat-card"><div class="stat-num" id="an-yesterday">0</div><div class="stat-label">YESTERDAY</div></div>
-          <div class="stat-card"><div class="stat-num" id="an-week">0</div><div class="stat-label">THIS WEEK</div></div>
-          <div class="stat-card"><div class="stat-num" id="an-month">0</div><div class="stat-label">THIS MONTH</div></div>
-          <div class="stat-card"><div class="stat-num" id="an-total">0</div><div class="stat-label">ALL VISITS</div></div>
-          <div class="stat-card"><div class="stat-num" id="an-downloads">0</div><div class="stat-label">DOWNLOADS</div></div>
-          <div class="stat-card"><div class="stat-num" id="an-views">0</div><div class="stat-label">POST VIEWS</div></div>
-        </div>
-
-        <!-- 7 DAY CHART -->
-        <div class="analytics-chart">
-          <h4>📅 LAST 7 DAYS (VISITS)</h4>
-          <div class="bar-chart" id="barChart7"></div>
-        </div>
-
-        <!-- MONTHLY CHART -->
-        <div class="analytics-chart">
-          <h4>📅 LAST 6 MONTHS</h4>
-          <div class="bar-chart" id="barChart6m"></div>
-        </div>
-
-        <!-- DEVICE BREAKDOWN -->
-        <div class="analytics-chart">
-          <h4>📱 DEVICE BREAKDOWN</h4>
-          <div id="deviceChart"></div>
-        </div>
-
-        <!-- TRAFFIC SOURCE -->
-        <div class="analytics-chart">
-          <h4>🔗 TRAFFIC SOURCE</h4>
-          <div id="sourceChart"></div>
-        </div>
-
-        <!-- TOP COUNTRIES -->
-        <div class="analytics-chart">
-          <h4>🌍 TOP COUNTRIES</h4>
-          <div id="countryChart"></div>
-        </div>
-
-        <!-- TOP POSTS BY VIEWS -->
-        <div class="analytics-chart">
-          <h4>🔥 TOP POSTS (BY VIEWS)</h4>
-          <div id="topPostsViews"></div>
-        </div>
-
-        <!-- TOP POSTS BY DOWNLOADS -->
-        <div class="analytics-chart">
-          <h4>⬇️ TOP POSTS (BY DOWNLOADS)</h4>
-          <div id="topPostsDl"></div>
-        </div>
-
-        <div style="margin-top:12px;">
-          <button class="btn btn-danger btn-sm" onclick="clearAnalytics()">🗑️ Clear Analytics Data</button>
-        </div>
-      </div>
-
-      <!-- ADD POST -->
-      <div class="tab-content" id="tab-addpost">
-        <div class="section-title">➕ ADD / EDIT POST</div>
-        <div class="section-card">
-          <input type="hidden" id="editPostId">
-
-          <div class="form-group"><label>TITLE *</label><input type="text" id="pTitle" placeholder="e.g. PUBG 4.2 V15 VIP File 🔥"></div>
-          <div class="form-group"><label>DESCRIPTION <span class="optional-tag">OPTIONAL</span></label><textarea id="pDesc" placeholder="Post description..."></textarea></div>
-
-          <div class="collapsible">
-            <div class="collapsible-header" onclick="toggleCollapse(this)">🖼️ THUMBNAIL <span class="optional-tag">OPTIONAL</span><span>▼</span></div>
-            <div class="collapsible-body">
-              <div class="form-group">
-                <div class="img-upload-area" onclick="document.getElementById('thumbFile').click()">
-                  <input type="file" id="thumbFile" accept="image/*" onchange="handleThumbUpload(event)" style="display:none">
-                  <div class="upload-icon">🖼️</div><div class="upload-text">Click to upload from gallery</div>
-                  <img id="thumbPreview" class="img-preview">
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">
+                <h1>GFX GAMER LAB</h1>
+                <p style="color: var(--text-muted); margin-top: 5px;">ADMIN PANEL</p>
+            </div>
+            
+            <div class="error-msg" id="loginError">❌ Wrong username or password!</div>
+            
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
                 </div>
-                <input type="hidden" id="pThumbnail">
-              </div>
-            </div>
-          </div>
-
-          <div class="collapsible">
-            <div class="collapsible-header" onclick="toggleCollapse(this)">🎬 VIDEO <span class="optional-tag">OPTIONAL</span><span>▼</span></div>
-            <div class="collapsible-body">
-              <div class="form-group">
-                <label>📁 UPLOAD FROM GALLERY (Auto-play muted)</label>
-                <div class="video-upload-area" onclick="document.getElementById('videoFile').click()">
-                  <input type="file" id="videoFile" accept="video/*" onchange="handleVideoUpload(event)" style="display:none">
-                  <div class="upload-icon">🎬</div>
-                  <div class="upload-text">Upload video<br><small style="color:var(--muted);">Auto-plays muted • Max 100MB</small></div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
                 </div>
-                <div class="video-progress" id="videoProgress"><div class="video-progress-bar" id="videoProgressBar"></div></div>
-                <div id="videoFileName" style="font-size:12px;color:var(--green);margin-top:5px;"></div>
-                <div class="video-preview-wrap" id="videoPreviewWrap"><video id="videoPreview" controls muted></video></div>
-                <input type="hidden" id="pVideoUrl">
-              </div>
-              <div class="form-group">
-                <label>🔗 YOUTUBE LINK <span class="optional-tag">OPTIONAL</span></label>
-                <input type="text" id="pVideoEmbed" placeholder="https://youtube.com/watch?v=... (auto-plays muted)">
-                <small>YouTube, any embed URL — auto-plays muted when post is opened</small>
-              </div>
-            </div>
-          </div>
-
-          <div class="collapsible">
-            <div class="collapsible-header" onclick="toggleCollapse(this)">⬇️ DOWNLOAD LINKS <span class="optional-tag">OPTIONAL</span><span>▼</span></div>
-            <div class="collapsible-body">
-              <div class="form-group"><label>MAIN DOWNLOAD LINK TITLE <span class="optional-tag">OPTIONAL</span></label><input type="text" id="pDownloadTitle" placeholder="e.g. PUBG GL Download, Global Version, 32-bit"><small>Button pr show hoga — khaali rakho to sirf ⬇ DOWNLOAD dikhega</small></div>
-              <div class="form-group"><label>MAIN DOWNLOAD LINK</label><input type="text" id="pDownload" placeholder="https://... (MediaFire, Drive, Telegram, etc.)"></div>
-              <div style="height:1px;background:var(--border);margin:12px 0;"></div>
-              <div class="form-group"><label>ALT DOWNLOAD LINK 2 TITLE <span class="optional-tag">OPTIONAL</span></label><input type="text" id="pDownload2Title" placeholder="e.g. BGMI Download, India Version, 64-bit"><small>Dusry button ka title — e.g. BGMI, India Version, Mirror, etc.</small></div>
-              <div class="form-group"><label>ALT DOWNLOAD LINK 2 <span class="optional-tag">OPTIONAL</span></label><input type="text" id="pDownload2" placeholder="https://... (backup/mirror link)"></div>
-            </div>
-          </div>
-
-          <div class="collapsible">
-            <div class="collapsible-header" onclick="toggleCollapse(this)">🔗 TELEGRAM & WHATSAPP <span class="optional-tag">OPTIONAL</span><span>▼</span></div>
-            <div class="collapsible-body">
-              <div class="form-group"><label>TELEGRAM POST LINK</label><input type="text" id="pTelegram" placeholder="https://t.me/..."></div>
-              <div class="form-group"><label>WHATSAPP POST LINK</label><input type="text" id="pWhatsApp" placeholder="https://whatsapp.com/..."></div>
-            </div>
-          </div>
-
-          <div class="collapsible">
-            <div class="collapsible-header" onclick="toggleCollapse(this)">🔍 SEO TAGS <span class="optional-tag">OPTIONAL</span><span>▼</span></div>
-            <div class="collapsible-body">
-              <div class="form-group">
-                <label>SEO TAGS (comma separated)</label>
-                <input type="text" id="pSeoTags" placeholder="pubg config, gfx tool, 90fps, sensitivity, vip file">
-                <small>These tags help Google find this post. Add relevant keywords separated by commas.</small>
-              </div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="savePost()" id="savePostBtn">💾 SAVE POST</button>
-            <button class="btn btn-danger" onclick="clearPostForm()">🗑️ CLEAR</button>
-          </div>
+                <button type="submit" class="btn btn-primary btn-full">LOGIN ➤</button>
+            </form>
         </div>
-      </div>
-
-      <!-- MANAGE POSTS -->
-      <div class="tab-content" id="tab-manageposts">
-        <div class="section-title">📋 MANAGE POSTS</div>
-        <div id="postsList"><div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div></div>
-      </div>
-
-      <!-- TUTORIALS -->
-      <div class="tab-content" id="tab-tutorials">
-        <div class="section-title">🎬 TUTORIALS</div>
-        <div class="section-card">
-          <input type="hidden" id="editTutId">
-          <div class="form-group"><label>TUTORIAL TITLE *</label><input type="text" id="tutTitle" placeholder="e.g. How to set PUBG GFX settings"></div>
-          <div class="form-group"><label>YOUTUBE LINK *</label><input type="text" id="tutLink" placeholder="https://youtube.com/watch?v=..."></div>
-          <button class="btn btn-primary" onclick="saveTutorial()">💾 SAVE TUTORIAL</button>
-        </div>
-        <div id="tutorialsList"></div>
-      </div>
-
-      <!-- SOCIAL LINKS -->
-      <div class="tab-content" id="tab-socials">
-        <div class="section-title">📱 SOCIAL LINKS</div>
-        <div class="section-card">
-          <div class="form-group"><label>▶ YOUTUBE</label><input type="text" id="sYoutube" placeholder="https://youtube.com/..."></div>
-          <div class="form-group"><label>✈ TELEGRAM CHANNEL</label><input type="text" id="sTelegram" placeholder="https://t.me/..."></div>
-          <div class="form-group"><label>TELEGRAM MEMBERS COUNT <span class="optional-tag">OPTIONAL</span></label><input type="text" id="sTelegramMembers" placeholder="e.g. 3,514"><small>Shows in hero join button</small></div>
-          <div class="form-group"><label>💬 WHATSAPP CHANNEL</label><input type="text" id="sWhatsApp" placeholder="https://whatsapp.com/..."></div>
-          <div class="form-group"><label>f FACEBOOK</label><input type="text" id="sFacebook" placeholder="https://facebook.com/..."></div>
-          <div class="form-group"><label>♪ TIKTOK</label><input type="text" id="sTiktok" placeholder="https://tiktok.com/..."></div>
-          <button class="btn btn-primary" onclick="saveSocials()">💾 SAVE</button>
-        </div>
-      </div>
-
-      <!-- CONTACT -->
-      <div class="tab-content" id="tab-contact">
-        <div class="section-title">📞 CONTACT US</div>
-        <div class="section-card">
-          <div class="form-group"><label>✈ TELEGRAM GROUP LINK</label><input type="text" id="cTelegram" placeholder="https://t.me/..."></div>
-          <div class="form-group"><label>f FACEBOOK LINK</label><input type="text" id="cFacebook" placeholder="https://facebook.com/..."></div>
-          <button class="btn btn-primary" onclick="saveContacts()">💾 SAVE</button>
-        </div>
-      </div>
-
-      <!-- ADS (6 slots) -->
-      <div class="tab-content" id="tab-ads">
-        <div class="section-title">📢 ADS MANAGEMENT</div>
-        <div class="section-card">
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Paste ad code from <strong style="color:var(--neon);">Adsterra</strong>, <strong style="color:var(--neon);">PropellerAds</strong>, Google AdSense, or any network. Toggle ON to show on site.</p>
-
-          <div class="form-group">
-            <label>1️⃣ TOP BANNER AD <span class="optional-tag">OPTIONAL</span></label>
-            <div class="toggle-wrap"><div class="toggle" id="togAdTop" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show on website</span></div>
-            <textarea id="adTop" placeholder="Paste Adsterra / AdSense banner code..."></textarea>
-            <small>728x90 or 320x50 (mobile) — shows at very top</small>
-          </div>
-
-          <div class="form-group">
-            <label>2️⃣ SIDEBAR AD <span class="optional-tag">OPTIONAL</span></label>
-            <div class="toggle-wrap"><div class="toggle" id="togAdSide" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show on website</span></div>
-            <textarea id="adSidebar" placeholder="Paste sidebar ad code (300x250 recommended)..."></textarea>
-            <small>300x250 — shows in right sidebar</small>
-          </div>
-
-          <div class="form-group">
-            <label>3️⃣ IN-CONTENT AD <span class="optional-tag">OPTIONAL</span></label>
-            <div class="toggle-wrap"><div class="toggle" id="togAdContent" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show on website</span></div>
-            <textarea id="adInContent" placeholder="Paste in-content / native banner code..."></textarea>
-            <small>Shows above posts — Native Banner recommended</small>
-          </div>
-
-          <div class="form-group">
-            <label>4️⃣ BELOW HERO AD <span class="optional-tag">OPTIONAL</span></label>
-            <div class="toggle-wrap"><div class="toggle" id="togAdHero" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show on website</span></div>
-            <textarea id="adBelowHero" placeholder="Paste ad code — shows between hero and posts..."></textarea>
-            <small>Shows between hero section and search bar</small>
-          </div>
-
-          <div class="form-group">
-            <label>5️⃣ MID-CONTENT AD <span class="optional-tag">OPTIONAL</span></label>
-            <div class="toggle-wrap"><div class="toggle" id="togAdMid" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show on website</span></div>
-            <textarea id="adMid" placeholder="Paste ad code — shows in middle of posts..."></textarea>
-            <small>Shows after posts grid — good for Native Banner</small>
-          </div>
-
-          <div class="form-group">
-            <label>6️⃣ PRE-DOWNLOAD AD <span class="optional-tag">OPTIONAL</span></label>
-            <div class="toggle-wrap"><div class="toggle" id="togAdPreDl" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show on website</span></div>
-            <textarea id="adPreDownload" placeholder="Paste ad code — shows in download countdown popup..."></textarea>
-            <small>⭐ HIGHEST EARNING — shows during 5-second download countdown!</small>
-          </div>
-
-          <div class="form-group">
-            <label>7️⃣ FOOTER AD <span class="optional-tag">OPTIONAL</span></label>
-            <div class="toggle-wrap"><div class="toggle" id="togAdFooter" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show on website</span></div>
-            <textarea id="adFooter" placeholder="Paste footer ad / Social Bar code..."></textarea>
-            <small>Shows at bottom — Social Bar recommended</small>
-          </div>
-
-          <button class="btn btn-primary" onclick="saveAds()">💾 SAVE ADS</button>
-        </div>
-      </div>
-
-      <!-- SEO TAB -->
-      <div class="tab-content" id="tab-seo">
-        <div class="section-title">🔍 SEO SETTINGS</div>
-        <div class="section-card">
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;">SEO settings help Google rank your website higher in search results. Add relevant keywords so people searching for PUBG configs find your site!</p>
-          <div class="form-group">
-            <label>GLOBAL SEO KEYWORDS</label>
-            <textarea id="sSeoText" placeholder="PUBG Mobile config, GFX tool, PUBG sensitivity settings, free download, PUBG Pakistan..." style="min-height:120px;"></textarea>
-            <small>Comma separated. These keywords are added to every page of your website.</small>
-          </div>
-          <div class="form-group">
-            <label>META DESCRIPTION <span class="optional-tag">OPTIONAL</span></label>
-            <textarea id="sSeoDesc" placeholder="GFX Gamer Lab - Free PUBG Mobile pro configs, GFX tools & premium gaming resources..." style="min-height:80px;"></textarea>
-            <small>Max 160 characters. This shows in Google search results under your website title.</small>
-          </div>
-          <div class="form-group">
-            <label>ANNOUNCEMENT BAR TEXT <span class="optional-tag">OPTIONAL</span></label>
-            <input type="text" id="sAnnouncementText" placeholder="🔥 New Config Added! | ⚡ 90FPS Available | 💎 VIP File Updated!">
-            <small>Scrolling ticker bar at top of website. Leave empty to hide.</small>
-          </div>
-          <div class="form-group">
-            <label>ANNOUNCEMENT BAR</label>
-            <div class="toggle-wrap"><div class="toggle" id="togAnnouncement" onclick="this.classList.toggle('on')"></div><span class="toggle-label">Show announcement bar</span></div>
-          </div>
-          <button class="btn btn-primary" onclick="saveSEO()">💾 SAVE SEO</button>
-        </div>
-        <div class="section-card">
-          <div class="section-title" style="font-size:11px;">💡 SEO TIPS</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.9;">
-            ✅ Add post SEO tags when creating posts (in Add Post → SEO Tags)<br>
-            ✅ Use keywords in post titles like "PUBG Mobile Config 2024 Free Download"<br>
-            ✅ Add description to every post<br>
-            ✅ Share posts on Telegram — Google sees backlinks<br>
-            ✅ Post regularly — Google ranks active sites higher<br>
-            ✅ Site is already submitted to Google Search Console ✓
-          </div>
-        </div>
-      </div>
-
-      <!-- FEEDBACK -->
-      <div class="tab-content" id="tab-feedback">
-        <div class="section-title">💬 USER FEEDBACK</div>
-        <div style="display:flex;gap:8px;margin-bottom:14px;">
-          <button class="btn btn-danger btn-sm" onclick="clearAllFeedback()">🗑️ Clear All</button>
-        </div>
-        <div id="feedbackList"><div class="loading"><div class="loading-spinner"></div></div></div>
-      </div>
-
-      <!-- SETTINGS -->
-      <div class="tab-content" id="tab-settings">
-        <div class="section-title">⚙️ SITE SETTINGS</div>
-        <div class="section-card">
-          <div class="form-group">
-            <label>LOGO / PROFILE IMAGE</label>
-            <div class="img-upload-area" onclick="document.getElementById('logoFile').click()">
-              <input type="file" id="logoFile" accept="image/*" onchange="handleLogoUpload(event)" style="display:none">
-              <div class="upload-icon">🖼️</div><div class="upload-text">Upload logo from gallery</div>
-              <img id="logoPreview" class="img-preview">
-            </div>
-            <input type="hidden" id="sLogoImg">
-          </div>
-          <div class="form-group"><label>HERO DESCRIPTION</label><textarea id="sHeroDesc" placeholder="Homepage hero text..."></textarea></div>
-          <div class="form-group"><label>ABOUT US TEXT</label><textarea id="sAboutText" placeholder="About page text..."></textarea></div>
-          <div class="form-group"><label>ABOUT YOUTUBE TEXT</label><textarea id="sAboutYt" placeholder="YouTube section text..."></textarea></div>
-          <div class="form-group"><label>PRIVACY POLICY</label><textarea id="sPrivacy" placeholder="Privacy policy..." style="min-height:140px;"></textarea></div>
-          <div class="form-group"><label>TRUST RATING LINK <span class="optional-tag">OPTIONAL</span></label><input type="text" id="sTrustLink" placeholder="https://..."></div>
-          <button class="btn btn-primary" onclick="saveSettings()">💾 SAVE SETTINGS</button>
-        </div>
-        <div class="section-card">
-          <div class="section-title">🔑 CHANGE PASSWORD</div>
-          <div class="form-group"><label>CURRENT PASSWORD</label><input type="password" id="pwCurrent"></div>
-          <div class="form-group"><label>NEW PASSWORD</label><input type="password" id="pwNew"></div>
-          <div class="form-group"><label>CONFIRM PASSWORD</label><input type="password" id="pwConfirm"></div>
-          <button class="btn btn-edit" onclick="changePassword()">🔑 CHANGE PASSWORD</button>
-        </div>
-      </div>
-
     </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-const SUPABASE_URL='https://clvmcoaufhmqkflolmtw.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsdm1jb2F1ZmhtcWtmbG9sbXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MDQyNzAsImV4cCI6MjA4ODQ4MDI3MH0.kdua1_V2WCVAM7BoEODP8jGIq1NJqQ4T0BwHwAxlDc4';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
-// AUTH
-const CREDS_KEY='gfx_admin_creds';
-function getCreds(){try{return JSON.parse(localStorage.getItem(CREDS_KEY))||{user:'nisarahmad.salihi752@gmail.com',pass:'nisar03746906@N'};}catch(e){return{user:'nisarahmad.salihi752@gmail.com',pass:'nisar03746906@N'};}}
-function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
-  const c=getCreds();
-  if(u===c.user&&p===c.pass){sessionStorage.setItem('gfx_auth','1');document.getElementById('loginWrap').style.display='none';document.getElementById('adminPanel').style.display='block';initAdmin();}
-  else{document.getElementById('loginError').style.display='block';setTimeout(()=>document.getElementById('loginError').style.display='none',3000);}
-}
-function doLogout(){sessionStorage.removeItem('gfx_auth');location.reload();}
-if(sessionStorage.getItem('gfx_auth')==='1'){document.getElementById('loginWrap').style.display='none';document.getElementById('adminPanel').style.display='block';}
-
-function toast(msg,err=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' error':'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
-
-// TABS
-const tabOrder=['dashboard','analytics','addpost','manageposts','tutorials','socials','contact','ads','seo','feedback','settings'];
-function switchTab(id){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  const idx=tabOrder.indexOf(id);
-  if(idx>=0)document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
-  if(id==='manageposts')renderManagePosts();
-  if(id==='tutorials')renderTutorialsList();
-  if(id==='feedback')renderFeedbackList();
-  if(id==='dashboard')refreshDash();
-  if(id==='analytics')loadAnalytics();
-  document.getElementById('adminSidebar').classList.remove('open');
-}
-function toggleSidebar(){document.getElementById('adminSidebar').classList.toggle('open');}
-function toggleCollapse(h){const b=h.nextElementSibling;b.classList.toggle('open');h.querySelector('span:last-child').textContent=b.classList.contains('open')?'▲':'▼';}
-
-// UPLOADS
-function handleThumbUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{document.getElementById('pThumbnail').value=ev.target.result;const p=document.getElementById('thumbPreview');p.src=ev.target.result;p.style.display='block';};r.readAsDataURL(f);}
-function handleLogoUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{document.getElementById('sLogoImg').value=ev.target.result;const p=document.getElementById('logoPreview');p.src=ev.target.result;p.style.display='block';};r.readAsDataURL(f);}
-function handleVideoUpload(e){
-  const f=e.target.files[0];if(!f)return;
-  if(f.size>100*1024*1024){toast('Max 100MB. Use YouTube for bigger videos.',true);return;}
-  document.getElementById('videoProgress').style.display='block';
-  document.getElementById('videoFileName').textContent='⏳ Reading: '+f.name;
-  const r=new FileReader();let prog=0;
-  const iv=setInterval(()=>{prog=Math.min(prog+4,90);document.getElementById('videoProgressBar').style.width=prog+'%';},100);
-  r.onload=ev=>{clearInterval(iv);document.getElementById('videoProgressBar').style.width='100%';document.getElementById('pVideoUrl').value=ev.target.result;const w=document.getElementById('videoPreviewWrap');const v=document.getElementById('videoPreview');v.src=ev.target.result;w.style.display='block';document.getElementById('videoFileName').textContent='✅ '+f.name;};
-  r.readAsDataURL(f);
-}
-
-// POSTS
-async function savePost(){
-  const title=document.getElementById('pTitle').value.trim();
-  if(!title){toast('Title is required!',true);return;}
-  const editId=document.getElementById('editPostId').value;
-  const post={
-    title,
-    description:document.getElementById('pDesc').value.trim(),
-    thumbnail:document.getElementById('pThumbnail').value||null,
-    video_url:document.getElementById('pVideoUrl').value||null,
-    video_embed:document.getElementById('pVideoEmbed').value.trim()||null,
-    download_link:document.getElementById('pDownload').value.trim()||null,
-    download_title:document.getElementById('pDownloadTitle').value.trim()||null,
-    download_link2:document.getElementById('pDownload2').value.trim()||null,
-    download_title2:document.getElementById('pDownload2Title').value.trim()||null,
-    telegram_link:document.getElementById('pTelegram').value.trim()||null,
-    whatsapp_link:document.getElementById('pWhatsApp').value.trim()||null,
-    seo_tags:document.getElementById('pSeoTags').value.trim()||null,
-    created_at:Date.now()
-  };
-  try{
-    if(editId){delete post.created_at;await sb.from('posts').update(post).eq('id',editId);toast('✅ Post updated!');}
-    else{await sb.from('posts').insert([post]);toast('✅ Post saved!');}
-    clearPostForm();
-  }catch(e){toast('Error: '+e.message,true);}
-}
-function clearPostForm(){
-  ['pTitle','pDesc','pVideoUrl','pVideoEmbed','pDownload','pDownloadTitle','pDownload2','pDownload2Title','pTelegram','pWhatsApp','pSeoTags','pThumbnail','editPostId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('thumbPreview').style.display='none';
-  document.getElementById('videoPreviewWrap').style.display='none';
-  document.getElementById('videoFileName').textContent='';
-  document.getElementById('videoProgress').style.display='none';
-  document.getElementById('savePostBtn').textContent='💾 SAVE POST';
-  document.querySelectorAll('.collapsible-body').forEach(b=>{b.classList.remove('open');if(b.previousElementSibling)b.previousElementSibling.querySelector('span:last-child').textContent='▼';});
-}
-async function renderManagePosts(){
-  const el=document.getElementById('postsList');
-  el.innerHTML='<div class="loading"><div class="loading-spinner"></div></div>';
-  const {data}=await sb.from('posts').select('*').order('created_at',{ascending:false});
-  if(!data?.length){el.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px;">No posts yet.</div>';return;}
-  el.innerHTML=data.map(p=>{
-    const thumb=p.thumbnail?`<div class="post-item-thumb"><img src="${p.thumbnail}"></div>`:`<div class="post-item-thumb">🎮</div>`;
-    const date=p.created_at?new Date(parseInt(p.created_at)).toLocaleDateString():'—';
-    return `<div class="post-item">${thumb}<div class="post-item-info"><div class="post-item-title">${p.title}</div><div class="post-item-meta">${date}${p.video_url||p.video_embed?' • 🎬':''}${p.download_link?' • ⬇️':''}${p.download_link2?' • ⬇️2':''} • ❤ ${p.likes||0}${p.seo_tags?' • 🔍 SEO':''}</div><div class="post-item-actions"><button class="btn btn-edit btn-sm" onclick="editPost('${p.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}')">🗑️ Delete</button></div></div></div>`;
-  }).join('');
-}
-async function editPost(id){
-  const {data:p}=await sb.from('posts').select('*').eq('id',id).single();if(!p)return;
-  switchTab('addpost');
-  document.getElementById('editPostId').value=p.id;
-  document.getElementById('pTitle').value=p.title||'';
-  document.getElementById('pDesc').value=p.description||'';
-  document.getElementById('pThumbnail').value=p.thumbnail||'';
-  document.getElementById('pVideoUrl').value=p.video_url||'';
-  document.getElementById('pVideoEmbed').value=p.video_embed||'';
-  document.getElementById('pDownload').value=p.download_link||'';
-  document.getElementById('pDownloadTitle').value=p.download_title||'';
-  document.getElementById('pDownload2').value=p.download_link2||'';
-  document.getElementById('pDownload2Title').value=p.download_title2||'';
-  document.getElementById('pTelegram').value=p.telegram_link||'';
-  document.getElementById('pWhatsApp').value=p.whatsapp_link||'';
-  document.getElementById('pSeoTags').value=p.seo_tags||'';
-  if(p.thumbnail){const pv=document.getElementById('thumbPreview');pv.src=p.thumbnail;pv.style.display='block';}
-  if(p.video_url){document.getElementById('videoFileName').textContent='✅ Video loaded';const w=document.getElementById('videoPreviewWrap');document.getElementById('videoPreview').src=p.video_url;w.style.display='block';}
-  document.querySelectorAll('.collapsible-body').forEach(b=>{b.classList.add('open');if(b.previousElementSibling)b.previousElementSibling.querySelector('span:last-child').textContent='▲';});
-  document.getElementById('savePostBtn').textContent='💾 UPDATE POST';
-}
-async function deletePost(id){if(!confirm('Delete this post?'))return;await sb.from('posts').delete().eq('id',id);renderManagePosts();toast('🗑️ Deleted!');}
-
-// TUTORIALS
-async function saveTutorial(){
-  const title=document.getElementById('tutTitle').value.trim();const link=document.getElementById('tutLink').value.trim();
-  if(!title||!link){toast('Fill title and link!',true);return;}
-  const editId=document.getElementById('editTutId').value;
-  const tut={title,link,created_at:Date.now()};
-  if(editId){await sb.from('tutorials').update(tut).eq('id',editId);}else{await sb.from('tutorials').insert([tut]);}
-  document.getElementById('tutTitle').value='';document.getElementById('tutLink').value='';document.getElementById('editTutId').value='';
-  renderTutorialsList();toast('✅ Tutorial saved!');
-}
-async function renderTutorialsList(){
-  const el=document.getElementById('tutorialsList');
-  const {data}=await sb.from('tutorials').select('*').order('created_at',{ascending:false});
-  if(!data?.length){el.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;">No tutorials yet.</div>';return;}
-  el.innerHTML=data.map(t=>`<div class="post-item"><div class="post-item-thumb">▶</div><div class="post-item-info"><div class="post-item-title">${t.title}</div><div class="post-item-meta" style="word-break:break-all;">${t.link}</div><div class="post-item-actions"><button class="btn btn-danger btn-sm" onclick="deleteTutorial('${t.id}')">🗑️ Delete</button></div></div></div>`).join('');
-}
-async function deleteTutorial(id){await sb.from('tutorials').delete().eq('id',id);renderTutorialsList();toast('🗑️ Deleted!');}
-
-// SETTINGS
-async function loadSettingsFromDB(){
-  const {data}=await sb.from('settings').select('*');if(!data)return;
-  const s={};data.forEach(r=>{if(r.key)s[r.key]=r.value;});
-  if(s.logoImg){const p=document.getElementById('logoPreview');p.src=s.logoImg;p.style.display='block';document.getElementById('sLogoImg').value=s.logoImg;}
-  document.getElementById('sHeroDesc').value=s.heroDesc||'';
-  document.getElementById('sAboutText').value=s.aboutText||'';
-  document.getElementById('sAboutYt').value=s.aboutYtText||'';
-  document.getElementById('sPrivacy').value=s.privacyText||'';
-  document.getElementById('sTrustLink').value=s.trustLink||'';
-  document.getElementById('sSeoText').value=s.seoText||'';
-  document.getElementById('sSeoDesc').value=s.seoDesc||'';
-  document.getElementById('sAnnouncementText').value=s.announcementText||'';
-  if(s.announcementOn==='1')document.getElementById('togAnnouncement').classList.add('on');
-  document.getElementById('sYoutube').value=s.youtube||'';
-  document.getElementById('sTelegram').value=s.telegram||'';
-  document.getElementById('sTelegramMembers').value=s.telegramMembers||'';
-  document.getElementById('sWhatsApp').value=s.whatsapp||'';
-  document.getElementById('sFacebook').value=s.facebook||'';
-  document.getElementById('sTiktok').value=s.tiktok||'';
-  document.getElementById('cTelegram').value=s.contactTelegram||'';
-  document.getElementById('cFacebook').value=s.contactFacebook||'';
-  // Ads
-  document.getElementById('adTop').value=s.adTop||'';
-  document.getElementById('adSidebar').value=s.adSidebar||'';
-  document.getElementById('adInContent').value=s.adInContent||'';
-  document.getElementById('adBelowHero').value=s.adBelowHero||'';
-  document.getElementById('adMid').value=s.adMid||'';
-  document.getElementById('adPreDownload').value=s.adPreDownload||'';
-  document.getElementById('adFooter').value=s.adFooter||'';
-  if(s.adTop)document.getElementById('togAdTop').classList.add('on');
-  if(s.adSidebar)document.getElementById('togAdSide').classList.add('on');
-  if(s.adInContent)document.getElementById('togAdContent').classList.add('on');
-  if(s.adBelowHero)document.getElementById('togAdHero').classList.add('on');
-  if(s.adMid)document.getElementById('togAdMid').classList.add('on');
-  if(s.adPreDownload)document.getElementById('togAdPreDl').classList.add('on');
-  if(s.adFooter)document.getElementById('togAdFooter').classList.add('on');
-}
-async function upsert(key,value){await sb.from('settings').upsert([{key,value}],{onConflict:'key'});}
-
-async function saveSettings(){
-  const logo=document.getElementById('sLogoImg').value;
-  const pairs=[
-    ['heroDesc',document.getElementById('sHeroDesc').value.trim()],
-    ['aboutText',document.getElementById('sAboutText').value.trim()],
-    ['aboutYtText',document.getElementById('sAboutYt').value.trim()],
-    ['privacyText',document.getElementById('sPrivacy').value.trim()],
-    ['trustLink',document.getElementById('sTrustLink').value.trim()]
-  ];
-  if(logo)pairs.push(['logoImg',logo]);
-  for(const [k,v] of pairs)await upsert(k,v);
-  toast('✅ Settings saved!');
-}
-
-async function saveSEO(){
-  await upsert('seoText',document.getElementById('sSeoText').value.trim());
-  await upsert('seoDesc',document.getElementById('sSeoDesc').value.trim());
-  await upsert('announcementText',document.getElementById('sAnnouncementText').value.trim());
-  await upsert('announcementOn',document.getElementById('togAnnouncement').classList.contains('on')?'1':'0');
-  toast('✅ SEO settings saved!');
-}
-
-async function saveSocials(){
-  for(const [k,id] of [['youtube','sYoutube'],['telegram','sTelegram'],['telegramMembers','sTelegramMembers'],['whatsapp','sWhatsApp'],['facebook','sFacebook'],['tiktok','sTiktok']])
-    await upsert(k,document.getElementById(id).value.trim());
-  toast('✅ Social links saved!');
-}
-async function saveContacts(){
-  await upsert('contactTelegram',document.getElementById('cTelegram').value.trim());
-  await upsert('contactFacebook',document.getElementById('cFacebook').value.trim());
-  toast('✅ Saved!');
-}
-async function saveAds(){
-  const adFields=[
-    ['adTop','togAdTop'],['adSidebar','togAdSide'],['adInContent','togAdContent'],
-    ['adBelowHero','togAdHero'],['adMid','togAdMid'],['adPreDownload','togAdPreDl'],['adFooter','togAdFooter']
-  ];
-  for(const [field,tog] of adFields){
-    const on=document.getElementById(tog).classList.contains('on');
-    await upsert(field,on?document.getElementById(field).value:'');
-  }
-  toast('✅ Ads saved!');
-}
-
-function changePassword(){
-  const cur=document.getElementById('pwCurrent').value,nw=document.getElementById('pwNew').value,cf=document.getElementById('pwConfirm').value;
-  const c=getCreds();if(cur!==c.pass){toast('Wrong current password!',true);return;}
-  if(!nw||nw.length<6){toast('Min 6 characters!',true);return;}
-  if(nw!==cf){toast('Passwords do not match!',true);return;}
-  localStorage.setItem(CREDS_KEY,JSON.stringify({user:c.user,pass:nw}));
-  document.getElementById('pwCurrent').value='';document.getElementById('pwNew').value='';document.getElementById('pwConfirm').value='';
-  toast('✅ Password changed!');
-}
-
-// FEEDBACK
-async function renderFeedbackList(){
-  const el=document.getElementById('feedbackList');
-  el.innerHTML='<div class="loading"><div class="loading-spinner"></div></div>';
-  const {data}=await sb.from('feedbacks').select('*').order('date',{ascending:false});
-  if(!data?.length){el.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px;">No feedback yet.</div>';return;}
-  el.innerHTML=data.map(f=>{
-    const stars='⭐'.repeat(parseInt(f.rating)||0);
-    const date=new Date(f.date).toLocaleString();
-    const shown=f.admin_reply?`<div class="admin-reply-shown"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span class="admin-badge">ADMIN</span></div><div style="font-size:13px;">${f.admin_reply}</div></div>`:'';
-    return `<div class="fb-item"><div class="fb-header"><span class="fb-name">${f.name||'Anonymous'}</span><span class="fb-stars">${stars}</span></div><div class="fb-text">${f.text}</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">${date}</div>${shown}<div class="fb-reply-area"><textarea id="reply-${f.id}" placeholder="Write admin reply...">${f.admin_reply||''}</textarea><div style="display:flex;gap:6px;margin-top:6px;"><button class="btn btn-success btn-sm" onclick="saveReply('${f.id}')">💾 Save Reply</button><button class="btn btn-danger btn-sm" onclick="deleteFeedback('${f.id}')">🗑️ Delete</button></div></div></div>`;
-  }).join('');
-}
-async function saveReply(id){await sb.from('feedbacks').update({admin_reply:document.getElementById('reply-'+id).value.trim()||null}).eq('id',id);toast('✅ Reply saved!');renderFeedbackList();}
-async function deleteFeedback(id){if(!confirm('Delete?'))return;await sb.from('feedbacks').delete().eq('id',id);renderFeedbackList();toast('🗑️ Deleted!');}
-async function clearAllFeedback(){if(!confirm('Delete ALL feedback?'))return;await sb.from('feedbacks').delete().gt('id',0);renderFeedbackList();toast('🗑️ Cleared!');}
-
-// ANALYTICS - FULL VERSION
-async function loadAnalytics(){
-  try{
-    const now=new Date();
-    const today=now.toISOString().split('T')[0];
-    const yesterday=new Date(now-86400000).toISOString().split('T')[0];
-    const thisMonth=now.toISOString().slice(0,7);
-    const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
-    const weekStartStr=weekStart.toISOString().split('T')[0];
-
-    const {data:allData}=await sb.from('analytics').select('*').order('created_at',{ascending:false});
-    if(!allData)return;
-
-    // Separate visits vs post views vs downloads
-    const visits=allData.filter(r=>r.page&&!r.page.startsWith('view_')&&!r.page.startsWith('dl_'));
-    const postViews=allData.filter(r=>r.page&&r.page.startsWith('view_'));
-    const downloads=allData.filter(r=>r.page&&r.page.startsWith('dl_'));
-
-    const todayCount=visits.filter(r=>r.date===today).length;
-    const yestCount=visits.filter(r=>r.date===yesterday).length;
-    const monthCount=visits.filter(r=>r.month===thisMonth).length;
-    const weekCount=visits.filter(r=>r.date>=weekStartStr).length;
-
-    document.getElementById('an-today').textContent=todayCount;
-    document.getElementById('an-yesterday').textContent=yestCount;
-    document.getElementById('an-week').textContent=weekCount;
-    document.getElementById('an-month').textContent=monthCount;
-    document.getElementById('an-total').textContent=visits.length;
-    document.getElementById('an-downloads').textContent=downloads.length;
-    document.getElementById('an-views').textContent=postViews.length;
-
-    // 7 day chart
-    const days7=[];for(let i=6;i>=0;i--){const d=new Date(now-i*86400000);days7.push({date:d.toISOString().split('T')[0],label:d.toLocaleDateString('en',{weekday:'short'}),count:0});}
-    visits.forEach(r=>{const d=days7.find(x=>x.date===r.date);if(d)d.count++;});
-    const max7=Math.max(...days7.map(d=>d.count),1);
-    document.getElementById('barChart7').innerHTML=days7.map(d=>`<div class="bar-wrap"><div class="bar-val">${d.count}</div><div class="bar" style="height:${Math.round((d.count/max7)*100)}px"></div><div class="bar-label">${d.label}</div></div>`).join('');
-
-    // 6 month chart
-    const months6=[];for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const m=d.toISOString().slice(0,7);months6.push({month:m,label:d.toLocaleDateString('en',{month:'short'}),count:0});}
-    visits.forEach(r=>{const m=months6.find(x=>x.month===r.month);if(m)m.count++;});
-    const max6=Math.max(...months6.map(m=>m.count),1);
-    document.getElementById('barChart6m').innerHTML=months6.map(m=>`<div class="bar-wrap"><div class="bar-val">${m.count}</div><div class="bar" style="height:${Math.round((m.count/max6)*100)}px;background:linear-gradient(180deg,var(--neon2),var(--accent));"></div><div class="bar-label">${m.label}</div></div>`).join('');
-
-    // Device breakdown
-    const mobile=visits.filter(r=>r.device==='mobile').length;
-    const desktop=visits.filter(r=>r.device==='desktop').length;
-    const total=visits.length||1;
-    document.getElementById('deviceChart').innerHTML=`
-      <div class="device-row"><div class="device-name">📱 Mobile</div><div class="device-bar-wrap"><div class="device-bar" style="width:${Math.round(mobile/total*100)}%"></div></div><div class="device-count">${mobile}</div></div>
-      <div class="device-row"><div class="device-name">💻 Desktop</div><div class="device-bar-wrap"><div class="device-bar" style="width:${Math.round(desktop/total*100)}%;background:linear-gradient(90deg,var(--neon2),var(--accent));"></div></div><div class="device-count">${desktop}</div></div>`;
-
-    // Traffic source
-    const sources={direct:0,search:0,telegram:0,youtube:0,facebook:0,referral:0};
-    visits.forEach(r=>{if(sources.hasOwnProperty(r.page))sources[r.page]++;else if(r.page)sources.referral++;else sources.direct++;});
-    const srcTotal=visits.length||1;
-    const srcColors={'direct':'var(--neon)','search':'var(--green)','telegram':'#29b5e8','youtube':'#ff0000','facebook':'#1877f2','referral':'var(--neon2)'};
-    document.getElementById('sourceChart').innerHTML=Object.entries(sources).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="device-row"><div class="device-name" style="width:90px;">🔗 ${k.charAt(0).toUpperCase()+k.slice(1)}</div><div class="device-bar-wrap"><div class="device-bar" style="width:${Math.round(v/srcTotal*100)}%;background:${srcColors[k]||'var(--neon)'};"></div></div><div class="device-count">${v}</div></div>`).join('')||'<div style="color:var(--muted);font-size:13px;padding:10px;">No data yet</div>';
-
-    // Top countries
-    const countries={};visits.forEach(r=>{if(r.country&&r.country!=='Unknown'&&r.country!=='')countries[r.country]=(countries[r.country]||0)+1;});
-    const topC=Object.entries(countries).sort((a,b)=>b[1]-a[1]).slice(0,8);
-    const maxC=topC[0]?.[1]||1;
-    document.getElementById('countryChart').innerHTML=topC.length?topC.map(([c,v])=>`<div class="device-row"><div class="device-name">🌍 ${c}</div><div class="device-bar-wrap"><div class="device-bar" style="width:${Math.round(v/maxC*100)}%;background:linear-gradient(90deg,var(--green),var(--neon));"></div></div><div class="device-count">${v}</div></div>`).join(''):'<div style="color:var(--muted);font-size:13px;padding:10px;">No country data yet</div>';
-
-    // Top posts by views
-    const viewCounts={};postViews.forEach(r=>{const id=r.page.replace('view_','');viewCounts[id]=(viewCounts[id]||0)+1;});
-    const topViews=Object.entries(viewCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    if(topViews.length){
-      const {data:pData}=await sb.from('posts').select('id,title').in('id',topViews.map(([id])=>parseInt(id)));
-      document.getElementById('topPostsViews').innerHTML=topViews.map(([id,v],i)=>{const p=pData?.find(x=>x.id===parseInt(id));return `<div class="top-post-row"><div class="top-rank">${i+1}</div><div class="top-title">${p?.title||'Post #'+id}</div><div class="top-val">👁 ${v}</div></div>`;}).join('');
-    }else{document.getElementById('topPostsViews').innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;">No view data yet</div>';}
-
-    // Top posts by downloads
-    const dlCounts={};downloads.forEach(r=>{const id=r.page.replace('dl_','');dlCounts[id]=(dlCounts[id]||0)+1;});
-    const topDl=Object.entries(dlCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    if(topDl.length){
-      const {data:pData}=await sb.from('posts').select('id,title').in('id',topDl.map(([id])=>parseInt(id)));
-      document.getElementById('topPostsDl').innerHTML=topDl.map(([id,v],i)=>{const p=pData?.find(x=>x.id===parseInt(id));return `<div class="top-post-row"><div class="top-rank">${i+1}</div><div class="top-title">${p?.title||'Post #'+id}</div><div class="top-val">⬇ ${v}</div></div>`;}).join('');
-    }else{document.getElementById('topPostsDl').innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;">No download data yet</div>';}
-
-  }catch(e){console.log('Analytics error',e);}
-}
-async function clearAnalytics(){if(!confirm('Clear all analytics data?'))return;await sb.from('analytics').delete().gt('id',0);loadAnalytics();toast('🗑️ Analytics cleared!');}
-
-// DASHBOARD
-async function refreshDash(){
-  try{
-    const now=new Date();
-    const today=now.toISOString().split('T')[0];
-    const thisMonth=now.toISOString().slice(0,7);
-    const [{count:postCount},{count:tutCount},{data:fbs},{data:posts},{data:analytics}]=await Promise.all([
-      sb.from('posts').select('*',{count:'exact',head:true}),
-      sb.from('tutorials').select('*',{count:'exact',head:true}),
-      sb.from('feedbacks').select('id'),
-      sb.from('posts').select('likes'),
-      sb.from('analytics').select('date,month,page')
-    ]);
-    const visits=analytics?.filter(r=>r.page&&!r.page.startsWith('view_')&&!r.page.startsWith('dl_'))||[];
-    const dls=analytics?.filter(r=>r.page&&r.page.startsWith('dl_'))||[];
-    document.getElementById('dash-posts').textContent=postCount||0;
-    document.getElementById('dash-tutorials').textContent=tutCount||0;
-    document.getElementById('dash-feedback').textContent=fbs?.length||0;
-    document.getElementById('dash-likes').textContent=posts?.reduce((s,p)=>s+(p.likes||0),0)||0;
-    document.getElementById('dash-today').textContent=visits.filter(r=>r.date===today).length;
-    document.getElementById('dash-month').textContent=visits.filter(r=>r.month===thisMonth).length;
-    document.getElementById('dash-total').textContent=visits.length;
-    document.getElementById('dash-downloads').textContent=dls.length;
-  }catch(e){console.log(e);}
-}
-
-async function initAdmin(){refreshDash();loadSettingsFromDB();}
-if(sessionStorage.getItem('gfx_auth')==='1')initAdmin();
-</script>
-</body>
-</html>
+    
+    <!-- Admin Container -->
+    <div class="admin-container" id="adminContainer">
+        <div class="admin-header">
+            <div class="admin-title">
+                <h2>⚡ ADMIN PANEL</h2>
+            </div>
+            <div class="admin-actions">
+                <a href="../index.html" class="btn" target="_blank">🌐 View Site</a>
+                <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+        
+        <div class="admin-layout">
+            <aside class="sidebar">
+                <ul class="sidebar-nav">
+                    <li><a href="#" onclick="showSection('dashboard')" class="active">📊 Dashboard</a></li>
+                    <li><a href="#" onclick="showSection('analytics')">📈 Analytics</a></li>
+                    <li><a href="#" onclick="showSection('addPost')">➕ Add Post</a></li>
+                    <li><a href="#" onclick="showSection('managePosts')">📋 Manage Posts</a></li>
+                    <li><a href="#" onclick="showSection('social')">📱 Social Links</a></li>
+                    <li><a href="#" onclick="showSection('ads')">📢 Ads</a></li>
+                    <li><a href="#" onclick="showSection('settings')">⚙️ Settings</a></li>
+                </ul>
+            </aside>
+            
+            <main class="main-content">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="section active">
+                    <h2>📊 DASHBOARD</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="dashTotalPosts">0</div>
+                            <div class="stat-label">POSTS</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="dashTotalDownloads">0</div>
+                            <div class="stat-label">DOWNLOADS</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="dashTodayVisits">0</div>
+                            <div class="stat-label">TODAY VISITS</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="dashMonthVisits">0</div>
+                            <div class="stat-label">MONTH VISITS</div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Analytics Section -->
+                <section id="analytics" class="section">
+                    <h2>📈 FULL ANALYTICS</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="analyticsToday">0</div>
+                            <div class="stat-label">TODAY</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="analyticsWeek">0</div>
+                            <div class="stat-label">THIS WEEK</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="analyticsMonth">0</div>
+                            <div class="stat-label">THIS MONTH</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="analyticsTotal">0</div>
+                            <div class="stat-label">ALL TIME</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>📅 Last 7 Days Visits</h3>
+                        <canvas id="visitsChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>🌍 Top Countries</h3>
+                        <canvas id="countriesChart"></canvas>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🔗 Traffic Sources</h3>
+                        <table id="sourcesTable">
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Visits</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sourcesTableBody">
+                                <tr><td colspan="3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🔥 Top Posts (By Views)</h3>
+                        <table id="topPostsTable">
+                            <thead>
+                                <tr>
+                                    <th>Post Title</th>
+                                    <th>Views</th>
+                                    <th>Downloads</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topPostsTableBody">
+                                <tr><td colspan="3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Add Post Section -->
+                <section id="addPost" class="section">
+                    <h2>➕ ADD POST</h2>
+                    <div class="card">
+                        <form id="postForm" onsubmit="return savePost(event)">
+                            <input type="hidden" id="editPostId" value="">
+                            
+                            <div class="form-group">
+                                <label>TITLE *</label>
+                                <input type="text" id="postTitle" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>DESCRIPTION</label>
+                                <textarea id="postDescription" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>🖼️ THUMBNAIL</label>
+                                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                    <button type="button" class="btn" onclick="document.getElementById('thumbnailFile').click()">📁 Upload File</button>
+                                    <button type="button" class="btn" onclick="toggleImageUrlInput()">🔗 Use Image URL</button>
+                                </div>
+                                <input type="file" id="thumbnailFile" accept="image/*" style="display: none;" onchange="handleThumbnailUpload(event)">
+                                <div id="imageUrlInput" style="display: none; margin-top: 10px;">
+                                    <input type="url" id="thumbnailUrl" placeholder="Paste image URL (e.g., from imgbb.com)" style="width: 100%; padding: 10px; background: var(--dark); border: 2px solid var(--border); border-radius: 8px; color: var(--text);">
+                                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">Upload to imgbb.com and paste direct image URL here</small>
+                                </div>
+                                <div class="image-preview" id="thumbnailPreview"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>🎬 VIDEO (Optional)</label>
+                                <input type="file" id="postVideo" accept="video/*">
+                                <small style="color: var(--text-muted);">Or paste YouTube link below</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <lab
