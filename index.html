@@ -1,61 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFX Gamer Lab — Mobile Gaming Pro Resources</title>
     <style>
-        /* Apka purana style sara yahan rahega */
-        .download-btn { display: block; background: #667eea; color: white; text-decoration: none; padding: 12px; border-radius: 8px; text-align: center; margin-top: 10px; font-weight: bold; }
-        .btn-desc { font-size: 12px; color: #8b92b0; margin-top: 5px; display: block; text-align: center; }
-        .post-card { background: #242b4a; border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        /* Aapka original button style */
+        .download-btn { display: block; width: 100%; padding: 12px; background: var(--primary); color: white; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 8px; }
+        .btn-info-text { font-size: 11px; color: var(--text-muted); display: block; text-align: center; margin-top: 4px; }
     </style>
 </head>
 <body>
-    <div id="postsContainer"></div>
+    <div id="postsList"></div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
     <script>
-        // Firebase Config (Same as Admin)
-        const firebaseConfig = { /* config */ };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
         async function loadPosts() {
-            const container = document.getElementById('postsContainer');
+            const container = document.getElementById('postsList');
             const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
             
             container.innerHTML = snapshot.docs.map(doc => {
                 const post = doc.data();
-                let buttonsHtml = '';
+                let buttonsMarkup = '';
 
-                // Unlimited Buttons Logic
-                if (post.links && Array.isArray(post.links)) {
-                    buttonsHtml = post.links.map(link => `
-                        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                            ${link.desc ? `<span class="btn-desc">${link.desc}</span>` : ''}
-                            <a href="${link.url}" class="download-btn" target="_blank">
-                                <i class="fas fa-download"></i> ${link.title}
+                // Handle Multiple Buttons
+                if (post.buttons && Array.isArray(post.buttons)) {
+                    buttonsMarkup = post.buttons.map(btn => `
+                        <div class="btn-wrapper" style="margin-bottom: 12px; border-top: 1px solid #333; padding-top: 10px;">
+                            ${btn.desc ? `<span class="btn-info-text">${btn.desc}</span>` : ''}
+                            <a href="${btn.url}" class="download-btn" target="_blank">
+                                <i class="fas fa-download"></i> ${btn.title}
                             </a>
                         </div>
                     `).join('');
-                } else if (post.link) { 
-                    // Purani posts ke liye fallback
-                    buttonsHtml = `<a href="${post.link}" class="download-btn" target="_blank">Download Now</a>`;
+                } else if (post.link) {
+                    // Purani posts ke liye
+                    buttonsMarkup = `<a href="${post.link}" class="download-btn" target="_blank">Download Now</a>`;
                 }
 
                 return `
                     <div class="post-card">
                         <h3>${post.title}</h3>
-                        <p style="color:#8b92b0; font-size:12px;">Category: ${post.category}</p>
-                        ${buttonsHtml}
+                        <div class="post-actions">
+                            ${buttonsMarkup}
+                        </div>
                     </div>
                 `;
             }).join('');
         }
-
         window.onload = loadPosts;
     </script>
 </body>
