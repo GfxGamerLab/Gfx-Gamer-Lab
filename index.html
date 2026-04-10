@@ -98,6 +98,38 @@
             100% { background-position: 0% 100%; }
         }
 
+        @keyframes cardScan {
+            0% { top: -5%; opacity: 0.9; }
+            80% { opacity: 0.6; }
+            100% { top: 110%; opacity: 0; }
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes shimmerSlide {
+            0% { left: -60%; }
+            100% { left: 130%; }
+        }
+
+        @keyframes pulseBorder {
+            0%, 100% { box-shadow: 0 0 0px rgba(204,0,0,0); border-color: rgba(204,0,0,0.15); }
+            50% { box-shadow: 0 0 18px rgba(204,0,0,0.5), 0 0 40px rgba(204,0,0,0.2); border-color: rgba(204,0,0,0.7); }
+        }
+
+        @keyframes downloadPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.06); box-shadow: 0 0 20px rgba(204,0,0,0.8); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -436,13 +468,14 @@
             background: var(--card-bg);
             border-radius: 10px;
             overflow: hidden;
-            transition: all 0.35s;
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
             cursor: pointer;
             border: 1px solid rgba(204,0,0,0.15);
             position: relative;
-            animation: fadeInUp 0.5s ease both;
+            animation: fadeInUp 0.5s ease both, pulseBorder 4s ease-in-out infinite;
         }
 
+        /* Top accent line */
         .post-card::before {
             content: '';
             position: absolute;
@@ -451,19 +484,52 @@
             background: var(--gradient);
             opacity: 0;
             transition: opacity 0.3s;
+            z-index: 2;
+        }
+
+        /* Shimmer shine on hover */
+        .post-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -60%;
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(204,0,0,0.08), transparent);
+            transform: skewX(-15deg);
+            transition: left 0.6s ease;
+            pointer-events: none;
+            z-index: 2;
         }
 
         .post-card:hover::before { opacity: 1; }
+        .post-card:hover::after { left: 130%; }
 
         .post-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-12px) scale(1.02);
             border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(204,0,0,0.3), 0 0 20px rgba(204,0,0,0.15);
+            box-shadow:
+                0 15px 40px rgba(204,0,0,0.35),
+                0 0 25px rgba(204,0,0,0.2),
+                inset 0 0 20px rgba(204,0,0,0.04);
+            animation: none;
         }
 
         .post-card:hover .post-title {
             color: var(--primary-bright);
-            text-shadow: 0 0 10px rgba(204,0,0,0.5);
+            text-shadow: 0 0 12px rgba(204,0,0,0.6), 0 0 25px rgba(204,0,0,0.3);
+        }
+
+        /* Scan beam inside card */
+        .post-card .card-scan {
+            position: absolute;
+            left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(204,0,0,0.5), transparent);
+            top: -5%;
+            animation: cardScan 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 3;
         }
 
         .post-thumbnail {
@@ -680,6 +746,7 @@
         .download-btn:hover {
             transform: scale(1.04);
             box-shadow: var(--neon-glow);
+            animation: downloadPop 0.4s ease;
         }
 
         .extra-btn {
@@ -920,81 +987,7 @@
             box-shadow: 0 0 15px rgba(204,0,0,0.3);
         }
 
-        /* ── COUNTDOWN MODAL ────────────────────────────────── */
-        .countdown-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.97);
-            z-index: 99999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .countdown-content {
-            background: var(--card-bg);
-            padding: 45px;
-            border-radius: 12px;
-            text-align: center;
-            max-width: 520px;
-            width: 90%;
-            border: 1px solid rgba(204,0,0,0.4);
-            box-shadow: 0 0 50px rgba(204,0,0,0.3);
-            position: relative;
-        }
-
-        .countdown-content::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient);
-            border-radius: 12px 12px 0 0;
-        }
-
-        .countdown-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--primary-bright);
-            letter-spacing: 2px;
-            animation: textGlow 1.5s infinite;
-        }
-
-        .countdown-timer {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 5rem;
-            font-weight: bold;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 20px 0;
-            animation: neonPulse 1s infinite;
-        }
-
-        .countdown-message {
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.9rem;
-        }
-
-        #preDownloadAd { margin: 15px 0; text-align: center; }
-
-        .countdown-cancel {
-            padding: 10px 30px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: var(--text-muted);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Share Tech Mono', monospace;
-            margin-top: 10px;
-        }
-
-        .countdown-cancel:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        /* countdown removed — direct download enabled */
 
         /* ── SECTION DIVIDER ────────────────────────────────── */
         .section-divider {
@@ -1180,7 +1173,7 @@
                 <h3>📬 Contact</h3>
                 <p>For any privacy concerns, contact us through our Telegram channel.</p>
 
-                <p style="margin-top:20px;font-size:0.8rem;color:#444;">Last updated: 2024 | GFX Gamer Lab</p>
+                <p style="margin-top:20px;font-size:0.8rem;color:#444;">Last updated: January 2026 | GFX Gamer Lab</p>
             </div>
         </section>
 
@@ -1220,17 +1213,6 @@
         </div>
     </div>
     
-    <!-- Download Countdown Modal -->
-    <div class="countdown-modal" id="countdownModal">
-        <div class="countdown-content">
-            <h3 class="countdown-title">⬇️ DOWNLOAD PREPARING</h3>
-            <p class="countdown-message">Please wait while your download prepares...</p>
-            <div id="preDownloadAd"></div>
-            <div class="countdown-timer" id="countdownTimer">5</div>
-            <button class="countdown-cancel" onclick="cancelDownload()">✕ Cancel</button>
-        </div>
-    </div>
-    
     <footer>
         <div class="footer-content">
             <h3>GFX GAMER LAB</h3>
@@ -1240,7 +1222,7 @@
                 <a href="#" id="footerTelegram" target="_blank">✈</a>
                 <a href="#" id="footerWhatsapp" target="_blank">💬</a>
             </div>
-            <p>© 2024 GFX Gamer Lab. All Rights Reserved. | Made with ❤️ for Gamers</p>
+            <p>© 2026 GFX Gamer Lab. All Rights Reserved.</p>
         </div>
     </footer>
     
@@ -1484,10 +1466,22 @@
                 else if (tags.includes('SENSITIVITY')) badge = '🎯 SENSITIVITY';
                 else if (tags.includes('VIP')) badge = '💎 VIP FILE';
                 else if (tags.includes('TUTORIAL')) badge = '📚 TUTORIAL';
-                const dlCount = (post.downloadButtons && post.downloadButtons.length > 0)
-                    ? post.downloadButtons.length : (post.downloadLink ? 1 : 0);
+
+                // Format upload date from Firestore timestamp
+                let uploadDate = '';
+                if (post.createdAt) {
+                    let d;
+                    if (post.createdAt.toDate) d = post.createdAt.toDate();
+                    else if (post.createdAt.seconds) d = new Date(post.createdAt.seconds * 1000);
+                    else d = new Date(post.createdAt);
+                    if (!isNaN(d)) {
+                        uploadDate = d.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+                    }
+                }
+
                 return `
                 <div class="post-card" onclick="openPost('${post.id}')" style="animation-delay:${idx * 0.05}s">
+                    <div class="card-scan"></div>
                     <img class="post-thumbnail"
                          src="${post.thumbnailUrl || post.thumbnail || 'https://via.placeholder.com/300x200'}"
                          alt="${escHtml(post.title)}"
@@ -1497,8 +1491,8 @@
                         <h3 class="post-title">${escHtml(post.title)}</h3>
                         <p class="post-description">${escHtml(post.description || '')}</p>
                         <div class="post-meta">
-                            <span>👁️ ${post.views || 0}</span>
-                            <span>⬇️ ${post.downloads || 0}</span>
+                            <span>👁️ ${post.views || 0} &nbsp; ⬇️ ${post.downloads || 0}</span>
+                            ${uploadDate ? `<span>📅 ${uploadDate}</span>` : ''}
                         </div>
                     </div>
                 </div>`;
@@ -1671,7 +1665,7 @@
             }, 2500);
         }
 
-        // ── Handle Download (Ad only 1 time) ─────────────────────────────────
+        // ── Handle Download (Ad only 1st time, direct on 2nd click) ──────────
         function handleDownload(postId, downloadUrl, btnEl) {
             if (!downloadClicks[postId]) downloadClicks[postId] = {};
             const key = downloadUrl;
@@ -1679,16 +1673,35 @@
             const cd = downloadClicks[postId][key];
 
             if (!cd.adShown) {
-                // First click — show smartlink ad ONCE
+                // First click — open smartlink ad ONCE
                 cd.adShown = true;
                 if (smartlinkUrl) window.open(smartlinkUrl, '_blank');
-                btnEl.textContent = '⬇️ CLICK AGAIN TO DOWNLOAD';
+                btnEl.innerHTML = '✅ CLICK AGAIN TO DOWNLOAD';
                 btnEl.style.background = 'linear-gradient(135deg, #00cc66 0%, #009944 100%)';
                 return;
             }
 
-            // Second click and beyond — go directly to countdown then download
-            showDownloadCountdown(postId, downloadUrl);
+            // Second click — directly open download, no countdown
+            window.open(downloadUrl, '_blank');
+            btnEl.innerHTML = '✅ DOWNLOADING...';
+            btnEl.style.background = 'linear-gradient(135deg, #cc0000 0%, #8b0000 100%)';
+            setTimeout(() => {
+                btnEl.innerHTML = '⬇️ DOWNLOAD AGAIN';
+            }, 3000);
+
+            // Track download in Firebase
+            (async () => {
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    await db.collection('posts').doc(postId).update({ downloads: firebase.firestore.FieldValue.increment(1) });
+                    await db.collection('analytics').add({
+                        type: 'download', postId, date: today,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(), count: 1
+                    });
+                    const p = allPosts.find(x => x.id === postId);
+                    if (p) p.downloads = (p.downloads || 0) + 1;
+                } catch (e) { console.error('download track error', e); }
+            })();
         }
 
         // ── Handle Extra Button ───────────────────────────────────────────────
@@ -1707,50 +1720,6 @@
             }
             window.open(url, '_blank');
             cd.count = 0;
-        }
-
-        // ── Download Countdown ────────────────────────────────────────────────
-        let countdownInterval;
-        let currentDownloadUrl;
-
-        function showDownloadCountdown(postId, downloadUrl) {
-            currentDownloadUrl = downloadUrl;
-            const modal = document.getElementById('countdownModal');
-            const timer = document.getElementById('countdownTimer');
-
-            // Re-inject pre-download ad every time countdown shows
-            if (preDownloadAdCode) {
-                injectAd('preDownloadAd', preDownloadAdCode);
-            }
-
-            modal.style.display = 'flex';
-            let seconds = 5;
-            timer.textContent = seconds;
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(async () => {
-                seconds--;
-                timer.textContent = seconds;
-                if (seconds <= 0) {
-                    clearInterval(countdownInterval);
-                    modal.style.display = 'none';
-                    window.open(downloadUrl, '_blank');
-                    try {
-                        const today = new Date().toISOString().split('T')[0];
-                        await db.collection('posts').doc(postId).update({ downloads: firebase.firestore.FieldValue.increment(1) });
-                        await db.collection('analytics').add({
-                            type: 'download', postId, date: today,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp(), count: 1
-                        });
-                        const p = allPosts.find(x => x.id === postId);
-                        if (p) p.downloads = (p.downloads || 0) + 1;
-                    } catch (e) { console.error('download track error', e); }
-                }
-            }, 1000);
-        }
-
-        function cancelDownload() {
-            clearInterval(countdownInterval);
-            document.getElementById('countdownModal').style.display = 'none';
         }
 
         // ── Close Modal ───────────────────────────────────────────────────────
