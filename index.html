@@ -16,8 +16,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    
-    <div id="ad-top-banner" style="text-align:center;width:100%;"></div>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
@@ -1367,13 +1365,25 @@
         // ── Load Posts ────────────────────────────────────────────────────────
         async function loadPosts() {
             try {
-                const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
+                let snapshot;
+                try {
+                    snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
+                } catch (indexErr) {
+                    // Fallback: get without orderBy if index missing
+                    snapshot = await db.collection('posts').get();
+                }
                 allPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Sort client-side by createdAt descending
+                allPosts.sort((a, b) => {
+                    const ta = a.createdAt ? (a.createdAt.seconds || 0) : 0;
+                    const tb = b.createdAt ? (b.createdAt.seconds || 0) : 0;
+                    return tb - ta;
+                });
                 document.getElementById('totalPosts').textContent = allPosts.length;
                 displayPosts(allPosts);
             } catch (error) {
                 console.error('Error loading posts:', error);
-                document.getElementById('postsGrid').innerHTML = '<div class="loading"><p>Error loading posts. Please refresh.</p></div>';
+                document.getElementById('postsGrid').innerHTML = '<div class="loading"><p>⚠️ Error loading posts. Please refresh.</p></div>';
             }
         }
 
@@ -1381,7 +1391,12 @@
         async function loadTutorials() {
             const grid = document.getElementById('tutorialsGrid');
             try {
-                const snap = await db.collection('tutorials').orderBy('createdAt', 'desc').get();
+                let snap;
+                try {
+                    snap = await db.collection('tutorials').orderBy('createdAt', 'desc').get();
+                } catch (_) {
+                    snap = await db.collection('tutorials').get();
+                }
                 if (snap.empty) {
                     grid.innerHTML = '<div class="loading"><p style="color:var(--text-muted)">No tutorials yet. Check back soon!</p></div>';
                     return;
@@ -1412,16 +1427,21 @@
             try {
                 const today = new Date().toISOString().split('T')[0];
                 const currentMonth = new Date().toISOString().slice(0, 7);
-                const todayDoc = await db.collection('analytics').doc(`visits_${today}`).get();
-                document.getElementById('todayVisits').textContent = todayDoc.exists ? (todayDoc.data().count || 0) : 0;
-                const monthSnapshot = await db.collection('analytics').where('type','==','visit').where('month','==',currentMonth).get();
-                let monthTotal = 0;
-                monthSnapshot.forEach(doc => { monthTotal += (doc.data().count || 0); });
-                document.getElementById('monthVisits').textContent = monthTotal;
-                const downloadsSnapshot = await db.collection('analytics').where('type','==','download').get();
-                let totalDownloads = 0;
-                downloadsSnapshot.forEach(doc => { totalDownloads += (doc.data().count || 0); });
-                document.getElementById('totalDownloads').textContent = totalDownloads;
+                try {
+                    const todayDoc = await db.collection('analytics').doc(`visits_${today}`).get();
+                    document.getElementById('todayVisits').textContent = todayDoc.exists ? (todayDoc.data().count || 0) : 0;
+                } catch (_) {}
+                try {
+                    const allAnalytics = await db.collection('analytics').get();
+                    let monthTotal = 0, totalDownloads = 0;
+                    allAnalytics.forEach(doc => {
+                        const d = doc.data();
+                        if (d.type === 'visit' && d.month === currentMonth) monthTotal += (d.count || 0);
+                        if (d.type === 'download') totalDownloads += (d.count || 0);
+                    });
+                    document.getElementById('monthVisits').textContent = monthTotal;
+                    document.getElementById('totalDownloads').textContent = totalDownloads;
+                } catch (_) {}
             } catch (e) { console.error('stats error', e); }
         }
 
