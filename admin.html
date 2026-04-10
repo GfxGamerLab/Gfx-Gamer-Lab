@@ -1383,35 +1383,46 @@
         }
         
         // ── Site Settings ─────────────────────────────────────────────────────
-        async function loadSiteSettings() {
-            try {
-                const doc = await db.collection('settings').doc('site').get();
-                if (doc.exists) {
-                    const d = doc.data();
-                    document.getElementById('logoUrl').value = d.logo || '';
-                    document.getElementById('heroDescription').value = d.heroDescription || '';
-                    document.getElementById('announcementText').value = d.announcementText || '';
-                    document.getElementById('metaTitle').value = d.metaTitle || '';
-                    document.getElementById('metaDescription').value = d.metaDescription || '';
-                    document.getElementById('metaKeywords').value = d.metaKeywords || '';
-                }
-            } catch (e) { console.error(e); }
+async function loadSiteSettings() {
+    try {
+        const doc = await db.collection('settings').doc('site').get();
+        if (doc.exists) {
+            const d = doc.data();
+            document.getElementById('logoUrl').value = d.logo || '';
+            document.getElementById('heroDescription').value = d.heroDescription || '';
+            document.getElementById('announcementText').value = d.announcementText || '';
+            document.getElementById('metaTitle').value = d.metaTitle || '';
+            document.getElementById('metaDescription').value = d.metaDescription || '';
+            document.getElementById('metaKeywords').value = d.metaKeywords || '';
         }
-        
-        async function saveSettings(e) {
-            e.preventDefault();
-            try {
-                await db.collection('settings').doc('site').set({
-                    logo: document.getElementById('logoUrl').value,
-                    heroDescription: document.getElementById('heroDescription').value,
-                    announcementText: document.getElementById('announcementText').value,
-                    metaTitle: document.getElementById('metaTitle').value,
-                    metaDescription: document.getElementById('metaDescription').value,
-                    metaKeywords: document.getElementById('metaKeywords').value,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert('✅ Settings saved!');
-            } catch (e) { alert('❌ Error: ' + e.message); }
-            return false;
-        }
-    
+    } catch (e) { console.error(e); }
+}
+
+async function saveSettings(e) {
+    e.preventDefault();
+    try {
+        await db.collection('settings').doc('site').set({
+            logo: document.getElementById('logoUrl').value,
+            heroDescription: document.getElementById('heroDescription').value,
+            announcementText: document.getElementById('announcementText').value,
+            metaTitle: document.getElementById('metaTitle').value,
+            metaDescription: document.getElementById('metaDescription').value,
+            metaKeywords: document.getElementById('metaKeywords').value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('✅ Settings saved!');
+    } catch (e) { alert('❌ Error: ' + e.message); }
+    return false;
+}
+</script>
+
+<!-- 👇 Apna custom credit -->
+<div style="text-align:center; padding:10px; font-size:14px;">
+    Made with ❤️ by 
+    <a href="https://t.me/gfxgamerlab" target="_blank" style="color:#00ffcc; text-decoration:none;">
+        Gfx Gamer Lab
+    </a>
+</div>
+
+</body>
+</html>
