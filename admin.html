@@ -6,7 +6,6 @@
     <title>GFX Gamer Lab — Admin Panel</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
@@ -195,8 +194,8 @@
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <h2>ADMIN LOGIN</h2>
-            <input type="email" id="loginEmail" placeholder="Email">
-            <input type="password" id="loginPassword" placeholder="Password">
+            <input type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')login()">
+            <input type="password" id="loginPassword" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
             <button onclick="login()">LOGIN</button>
             <p class="login-error" id="loginError"></p>
         </div>
@@ -219,6 +218,7 @@
                 <div class="sidebar-item" data-section="site" onclick="switchSection('site',this)">&#9881; Site Settings</div>
                 <div class="sidebar-item" data-section="analytics" onclick="switchSection('analytics',this)">&#128202; Analytics</div>
                 <div class="sidebar-item" data-section="feedback" onclick="switchSection('feedback',this)">&#128172; Feedback</div>
+                <div class="sidebar-item" data-section="downloads" onclick="switchSection('downloads',this)">&#11123; Downloads</div>
             </div>
             <div class="content-area">
 
@@ -336,6 +336,26 @@
                     <div id="recentVisits"></div>
                 </div>
 
+                <div class="content-section" id="sec-downloads">
+                    <h2 class="section-title">DOWNLOAD HTML FILES</h2>
+                    <div class="card">
+                        <p style="color:var(--text-muted);margin-bottom:20px;">Download the latest HTML files for your website. Right-click and choose 'Save As' to download.</p>
+                        <div style="margin-bottom:20px;">
+                            <h3 style="color:var(--primary-bright);font-family:'Orbitron',sans-serif;font-size:1rem;margin-bottom:10px;">Public Website (index.html)</h3>
+                            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:10px;">The main public-facing website with all features.</p>
+                            <a href="/public/index.html" download="index.html" class="btn btn-primary" style="display:inline-block;text-decoration:none;">&#11123; Download index.html</a>
+                            <a href="/public/index.html" target="_blank" class="btn btn-info" style="display:inline-block;text-decoration:none;margin-left:8px;">Preview</a>
+                        </div>
+                        <hr style="border-color:rgba(204,0,0,0.2);margin:20px 0;">
+                        <div>
+                            <h3 style="color:var(--primary-bright);font-family:'Orbitron',sans-serif;font-size:1rem;margin-bottom:10px;">Admin Panel (admin.html)</h3>
+                            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:10px;">The admin control panel for managing your website.</p>
+                            <a href="/public/admin.html" download="admin.html" class="btn btn-primary" style="display:inline-block;text-decoration:none;">&#11123; Download admin.html</a>
+                            <a href="/public/admin.html" target="_blank" class="btn btn-info" style="display:inline-block;text-decoration:none;margin-left:8px;">Preview</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="content-section" id="sec-feedback">
                     <h2 class="section-title">MANAGE FEEDBACK</h2>
                     <div id="feedbackAdminList"></div>
@@ -356,7 +376,9 @@
         };
         firebase.initializeApp(firebaseConfig);
         var db = firebase.firestore();
-        var auth = firebase.auth();
+
+        var ADMIN_EMAIL = 'nisarahmad.salihi752@gmail.com';
+        var ADMIN_PASS = 'nisar03746906@N';
 
         function showToast(msg, type) {
             var t = document.getElementById('toast');
@@ -368,33 +390,32 @@
             return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
-        async function login() {
-            var email = document.getElementById('loginEmail').value;
+        function login() {
+            var email = document.getElementById('loginEmail').value.trim();
             var pw = document.getElementById('loginPassword').value;
             var errEl = document.getElementById('loginError');
-            try {
-                await auth.signInWithEmailAndPassword(email, pw);
+            if (email === ADMIN_EMAIL && pw === ADMIN_PASS) {
+                sessionStorage.setItem('gfx_admin_auth', '1');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 loadAllData();
-            } catch (e) {
-                errEl.textContent = e.message; errEl.style.display = 'block';
+            } else {
+                errEl.textContent = 'Invalid email or password.';
+                errEl.style.display = 'block';
             }
         }
 
         function logout() {
-            auth.signOut();
+            sessionStorage.removeItem('gfx_admin_auth');
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
-        auth.onAuthStateChanged(function(user) {
-            if (user) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                loadAllData();
-            }
-        });
+        if (sessionStorage.getItem('gfx_admin_auth') === '1') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadAllData();
+        }
 
         function switchSection(name, el) {
             document.querySelectorAll('.sidebar-item').forEach(function(s) { s.classList.remove('active'); });
@@ -819,5 +840,5 @@
             } catch (e) { showToast('Error: ' + e.message, 'error'); }
         }
     </script>
-<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="5852b6a9-a3a5-41c0-9900-afba0846759b"></script></body>
+<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="b56e0103-21ac-40c8-a3ee-b755c485271e"></script></body>
 </html>
