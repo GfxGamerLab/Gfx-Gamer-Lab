@@ -1,1419 +1,822 @@
-<!DOCTYPE html>
+CTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFX Gamer Lab — Admin Panel</title>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --primary: #cc0000;
-            --primary-bright: #ff3333;
-            --secondary: #8b0000;
-            --danger: #cc0000;
-            --success: #00cc66;
-            --dark: #050a0a;
-            --card-bg: #0a1515;
-            --bg: #030608;
-            --text: #e0e0e0;
-            --text-muted: #6a8080;
-            --border: #1a0a0a;
-            --border-active: #cc0000;
+            --primary: #cc0000; --primary-bright: #ff3333; --secondary: #8b0000;
+            --dark: #050a0a; --card-bg: #0a1515; --bg: #030608;
+            --text: #e0e0e0; --text-muted: #6a8080; --success: #00cc66; --danger: #cc0000;
             --gradient: linear-gradient(135deg, #cc0000 0%, #8b0000 100%);
             --neon-glow: 0 0 8px rgba(204,0,0,0.7), 0 0 20px rgba(204,0,0,0.4);
         }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
-            pointer-events: none;
-            z-index: 9998;
-        }
-
-        /* ── ANIMATIONS ─────────────────────────────────── */
-        @keyframes glitch {
-            0%, 100% { text-shadow: 0 0 10px rgba(204,0,0,0.6); }
-            20% { text-shadow: -2px 0 #ff0000, 2px 0 #cc0000; transform: translate(-1px,0); }
-            40% { text-shadow: 2px 0 #ff0000, -2px 0 #cc0000; transform: translate(1px,0); }
-            60% { text-shadow: 0 0 10px rgba(204,0,0,0.6); }
-        }
-        @keyframes neonPulse {
-            0%,100% { box-shadow: 0 0 5px rgba(204,0,0,0.4); }
-            50% { box-shadow: 0 0 20px rgba(204,0,0,0.9), 0 0 40px rgba(204,0,0,0.4); }
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── LOGIN SCREEN ───────────────────────────────── */
         .login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            background: radial-gradient(ellipse at center, #0a0a0a 0%, #030608 100%);
-            position: relative;
+            display:flex; justify-content:center; align-items:center; min-height:100vh;
         }
-
-        .login-screen::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(204,0,0,0.02) 2px, rgba(204,0,0,0.02) 4px);
-            pointer-events: none;
-        }
-
         .login-box {
-            background: var(--card-bg);
-            padding: 45px;
-            border-radius: 10px;
-            max-width: 420px;
-            width: 100%;
-            border: 1px solid rgba(204,0,0,0.4);
-            box-shadow: 0 0 60px rgba(204,0,0,0.2), 0 0 120px rgba(204,0,0,0.08);
-            position: relative;
-            z-index: 1;
+            background:var(--card-bg); padding:40px; border-radius:12px; width:380px;
+            border:1px solid rgba(204,0,0,0.3); box-shadow:0 0 30px rgba(204,0,0,0.15);
         }
-
-        .login-box::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient);
-            border-radius: 10px 10px 0 0;
+        .login-box h2 {
+            font-family:'Orbitron',sans-serif; text-align:center; margin-bottom:30px;
+            background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
         }
-
-        .login-logo h1 {
-            text-align: center;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 900;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-            animation: glitch 4s infinite;
-            letter-spacing: 3px;
+        .login-box input {
+            width:100%; padding:12px 15px; margin-bottom:15px;
+            background:var(--dark); border:1px solid rgba(204,0,0,0.3); border-radius:6px;
+            color:var(--text); font-size:0.95rem;
         }
-
-        .login-logo p {
-            text-align: center;
-            color: var(--text-muted);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            margin-bottom: 30px;
+        .login-box input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 10px rgba(204,0,0,0.3); }
+        .login-box button {
+            width:100%; padding:12px; background:var(--gradient); border:none; color:white;
+            border-radius:6px; font-weight:700; cursor:pointer; font-size:1rem; transition:all 0.3s;
         }
+        .login-box button:hover { box-shadow:var(--neon-glow); transform:translateY(-2px); }
+        .login-error { color:var(--danger); text-align:center; margin-top:10px; font-size:0.85rem; display:none; }
 
-        /* ── FORMS ──────────────────────────────────────── */
-        .form-group { margin-bottom: 20px; }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            font-size: 0.82rem;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 1px;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            background: var(--dark);
-            border: 1px solid rgba(204,0,0,0.25);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 0.95rem;
-            font-family: 'Segoe UI', sans-serif;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(204,0,0,0.3);
-        }
-
-        /* ── BUTTONS ────────────────────────────────────── */
-        .btn {
-            padding: 11px 28px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 1px;
-        }
-
-        .btn-primary {
-            background: var(--gradient);
-            color: white;
-            border: 1px solid rgba(204,0,0,0.5);
-        }
-
-        .btn-primary:hover { box-shadow: var(--neon-glow); transform: translateY(-1px); }
-
-        .btn-success { background: linear-gradient(135deg, #00cc66 0%, #009944 100%); color: white; }
-        .btn-success:hover { box-shadow: 0 0 15px rgba(0,204,102,0.5); }
-
-        .btn-danger { background: var(--gradient); color: white; }
-        .btn-danger:hover { box-shadow: var(--neon-glow); }
-
-        .btn-full { width: 100%; }
-
-        /* ── ERROR MSG ──────────────────────────────────── */
-        .error-msg {
-            background: rgba(204,0,0,0.1);
-            border: 1px solid var(--danger);
-            color: var(--primary-bright);
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.9rem;
-        }
-
-        /* ── ADMIN CONTAINER ────────────────────────────── */
-        .admin-container { display: none; }
-
+        .admin-panel { display:none; min-height:100vh; }
         .admin-header {
-            background: var(--card-bg);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(204,0,0,0.3);
-            box-shadow: 0 2px 20px rgba(204,0,0,0.15);
+            background:rgba(5,10,10,0.97); padding:15px 20px; display:flex; justify-content:space-between; align-items:center;
+            border-bottom:1px solid rgba(204,0,0,0.3); box-shadow:0 2px 15px rgba(204,0,0,0.2);
+            position:sticky; top:0; z-index:100;
         }
-
-        .admin-title h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 3px;
-            animation: glitch 5s infinite;
+        .admin-header h1 {
+            font-family:'Orbitron',sans-serif; font-size:1.2rem; background:var(--gradient);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:2px;
         }
+        .admin-header button {
+            padding:8px 18px; background:var(--gradient); border:none; color:white;
+            border-radius:5px; cursor:pointer; font-weight:600; transition:all 0.3s;
+        }
+        .admin-header button:hover { box-shadow:var(--neon-glow); }
 
-        .admin-actions { display: flex; gap: 12px; }
+        .admin-layout { display:flex; min-height:calc(100vh - 60px); }
 
-        .admin-layout { display: flex; }
-
-        /* ── SIDEBAR ────────────────────────────────────── */
         .sidebar {
-            width: 240px;
-            background: var(--card-bg);
-            min-height: calc(100vh - 68px);
-            border-right: 1px solid rgba(204,0,0,0.2);
+            width:240px; background:var(--card-bg); padding:20px 0;
+            border-right:1px solid rgba(204,0,0,0.2); flex-shrink:0;
+        }
+        .sidebar-item {
+            padding:12px 20px; cursor:pointer; transition:all 0.3s; color:var(--text-muted);
+            font-family:'Share Tech Mono',monospace; font-size:0.9rem; letter-spacing:1px;
+            border-left:3px solid transparent;
+        }
+        .sidebar-item:hover { background:rgba(204,0,0,0.08); color:var(--text); }
+        .sidebar-item.active {
+            background:rgba(204,0,0,0.12); color:var(--primary-bright);
+            border-left-color:var(--primary); text-shadow:0 0 8px rgba(204,0,0,0.4);
         }
 
-        .sidebar-nav { list-style: none; padding: 15px 0; }
+        .content-area { flex:1; padding:30px; overflow-y:auto; }
+        .content-section { display:none; }
+        .content-section.active { display:block; }
 
-        .sidebar-nav a {
-            display: block;
-            padding: 13px 22px;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+        .section-title {
+            font-family:'Orbitron',sans-serif; font-size:1.5rem; margin-bottom:25px;
+            background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
         }
 
-        .sidebar-nav a:hover, .sidebar-nav a.active {
-            background: rgba(204,0,0,0.08);
-            color: var(--primary-bright);
-            border-left-color: var(--primary);
-            text-shadow: 0 0 8px rgba(204,0,0,0.5);
+        .form-group { margin-bottom:20px; }
+        .form-group label {
+            display:block; margin-bottom:8px; color:var(--text-muted);
+            font-family:'Share Tech Mono',monospace; font-size:0.85rem; letter-spacing:1px;
         }
-
-        /* ── MAIN CONTENT ───────────────────────────────── */
-        .main-content {
-            flex: 1;
-            padding: 28px;
-            overflow-y: auto;
-            max-height: calc(100vh - 68px);
+        .form-group input, .form-group textarea, .form-group select {
+            width:100%; padding:12px 15px; background:var(--dark); border:1px solid rgba(204,0,0,0.3);
+            border-radius:6px; color:var(--text); font-size:0.95rem; transition:all 0.3s;
         }
-
-        .section { display: none; }
-        .section.active { display: block; }
-
-        .section > h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline:none; border-color:var(--primary); box-shadow:0 0 10px rgba(204,0,0,0.3);
         }
+        .form-group textarea { min-height:100px; resize:vertical; }
 
-        /* ── STATS GRID ─────────────────────────────────── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 18px;
-            margin-bottom: 28px;
+        .btn {
+            padding:10px 22px; border:none; border-radius:6px; cursor:pointer;
+            font-weight:600; transition:all 0.3s; font-size:0.9rem; margin-right:8px; margin-bottom:8px;
         }
+        .btn-primary { background:var(--gradient); color:white; }
+        .btn-primary:hover { box-shadow:var(--neon-glow); transform:translateY(-2px); }
+        .btn-danger { background:rgba(204,0,0,0.15); color:var(--danger); border:1px solid var(--danger); }
+        .btn-danger:hover { background:var(--danger); color:white; }
+        .btn-success { background:rgba(0,204,102,0.15); color:var(--success); border:1px solid var(--success); }
+        .btn-success:hover { background:var(--success); color:white; }
+        .btn-info { background:rgba(0,136,204,0.15); color:#0088cc; border:1px solid #0088cc; }
+        .btn-info:hover { background:#0088cc; color:white; }
 
-        .stat-card {
-            background: var(--card-bg);
-            padding: 22px;
-            border-radius: 8px;
-            border: 1px solid rgba(204,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: var(--gradient);
-        }
-
-        .stat-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: bold;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.78rem;
-            margin-top: 5px;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 2px;
-        }
-
-        /* ── CARDS ──────────────────────────────────────── */
         .card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 22px;
-            margin-bottom: 18px;
-            border: 1px solid rgba(204,0,0,0.15);
+            background:var(--card-bg); border:1px solid rgba(204,0,0,0.15); border-radius:10px;
+            padding:20px; margin-bottom:15px; transition:all 0.3s;
         }
+        .card:hover { border-color:rgba(204,0,0,0.4); }
 
-        .card h3 {
-            margin-bottom: 18px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(204,0,0,0.2);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
-        }
-
-        .button-list { margin-top: 12px; }
-
-        .button-item {
-            background: var(--dark);
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            border: 1px solid rgba(204,0,0,0.1);
-        }
-
-        .button-item input {
-            flex: 1;
-            padding: 9px;
-            background: var(--bg);
-            border: 1px solid rgba(204,0,0,0.2);
-            border-radius: 5px;
-            color: var(--text);
-            font-size: 0.9rem;
-        }
-
-        .button-item input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .button-item button {
-            padding: 9px 14px;
-            background: rgba(204,0,0,0.15);
-            border: 1px solid rgba(204,0,0,0.4);
-            color: var(--primary-bright);
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        .button-item button:hover { background: var(--gradient); color: white; }
-
-        .add-button-btn {
-            padding: 10px 20px;
-            background: rgba(0,204,102,0.1);
-            border: 1px solid rgba(0,204,102,0.4);
-            color: #00cc66;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
-
-        .add-button-btn:hover {
-            background: rgba(0,204,102,0.2);
-            box-shadow: 0 0 10px rgba(0,204,102,0.3);
-        }
-
-        /* ── SECTION HEADER ─────────────────────────────── */
-        .section-header {
-            background: rgba(204,0,0,0.07);
-            padding: 14px;
-            border-radius: 6px;
-            margin-bottom: 18px;
-            border-left: 3px solid var(--primary);
-        }
-
-        .section-header h4 {
-            color: var(--primary-bright);
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 1px;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 6px;
-        }
-
-        /* ── TOGGLE SWITCH ──────────────────────────────── */
-        .toggle-switch { position: relative; width: 50px; height: 24px; display: inline-block; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(204,0,0,0.2); border-radius: 24px; transition: 0.3s;
-            border: 1px solid rgba(204,0,0,0.3);
-        }
-        .toggle-slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px;
-            left: 3px; bottom: 2px; background: var(--text-muted); border-radius: 50%; transition: 0.3s;
-        }
-        input:checked + .toggle-slider { background: rgba(0,204,102,0.3); border-color: #00cc66; }
-        input:checked + .toggle-slider:before { transform: translateX(26px); background: #00cc66; }
-
-        /* ── AD SECTION ─────────────────────────────────── */
-        .ad-section {
-            background: var(--dark);
-            padding: 18px;
-            border-radius: 8px;
-            margin-bottom: 18px;
-            border-left: 3px solid var(--primary);
-            border-top: 1px solid rgba(204,0,0,0.15);
-            border-right: 1px solid rgba(204,0,0,0.15);
-            border-bottom: 1px solid rgba(204,0,0,0.15);
-        }
-
-        .ad-section h4 {
-            margin-bottom: 14px;
-            color: var(--primary-bright);
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 1px;
-        }
-
-        .ad-help {
-            background: rgba(204,0,0,0.06);
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-            border: 1px solid rgba(204,0,0,0.15);
-        }
-
-        .seo-note {
-            background: rgba(0,204,102,0.07);
-            border: 1px solid rgba(0,204,102,0.25);
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            color: #00cc66;
-            margin-top: 7px;
-        }
-
-        /* ── POST ITEM ──────────────────────────────────── */
         .post-item {
-            background: var(--dark);
-            padding: 14px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(204,0,0,0.1);
-            transition: all 0.3s;
+            display:flex; gap:15px; align-items:center; padding:15px; margin-bottom:10px;
+            background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(204,0,0,0.1);
+        }
+        .post-item img { width:80px; height:60px; object-fit:cover; border-radius:6px; border:1px solid rgba(204,0,0,0.2); }
+        .post-item-info { flex:1; }
+        .post-item-title { font-weight:600; margin-bottom:5px; }
+        .post-item-meta { font-size:0.8rem; color:var(--text-muted); font-family:'Share Tech Mono',monospace; }
+        .post-item-actions { display:flex; gap:8px; }
+
+        .checkbox-group { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+        .checkbox-group input[type=checkbox] { width:auto; }
+        .checkbox-group label { margin:0; cursor:pointer; }
+
+        .dl-btn-row { display:flex; gap:10px; margin-bottom:10px; align-items:center; }
+        .dl-btn-row input { flex:1; }
+        .dl-btn-row button { flex-shrink:0; padding:8px 14px; }
+
+        .toast {
+            position:fixed; bottom:20px; right:20px; padding:15px 25px; border-radius:8px;
+            color:white; font-weight:600; z-index:10000; transform:translateY(100px);
+            transition:transform 0.3s; font-family:'Share Tech Mono',monospace;
+        }
+        .toast.show { transform:translateY(0); }
+        .toast.success { background:linear-gradient(135deg,#00cc66,#009944); box-shadow:0 5px 15px rgba(0,204,102,0.4); }
+        .toast.error { background:linear-gradient(135deg,#cc0000,#8b0000); box-shadow:0 5px 15px rgba(204,0,0,0.4); }
+
+        .analytics-grid {
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; margin-bottom:30px;
+        }
+        .analytics-card {
+            background:var(--card-bg); padding:20px; border-radius:8px; text-align:center;
+            border:1px solid rgba(204,0,0,0.2);
+        }
+        .analytics-value {
+            font-family:'Orbitron',sans-serif; font-size:1.8rem; background:var(--gradient);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        }
+        .analytics-label { font-size:0.75rem; color:var(--text-muted); margin-top:5px; text-transform:uppercase; letter-spacing:1px; }
+
+        .visit-item {
+            display:flex; justify-content:space-between; padding:10px 15px; margin-bottom:5px;
+            background:rgba(0,0,0,0.2); border-radius:5px; font-size:0.85rem; border-left:3px solid var(--primary);
         }
 
-        .post-item:hover { border-color: rgba(204,0,0,0.3); }
-
-        .post-actions { display: flex; gap: 10px; }
-
-        /* ── CHART CONTAINER ────────────────────────────── */
-        .chart-container {
-            background: var(--card-bg);
-            padding: 18px;
-            border-radius: 8px;
-            margin-bottom: 18px;
-            border: 1px solid rgba(204,0,0,0.15);
+        .feedback-admin-item {
+            background:var(--card-bg); border:1px solid rgba(204,0,0,0.15); border-radius:10px;
+            padding:20px; margin-bottom:15px;
         }
-
-        .chart-container h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
+        .feedback-admin-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        .feedback-admin-name { font-weight:600; }
+        .feedback-admin-stars { color:#ffcc00; font-size:1.1rem; }
+        .feedback-admin-text { color:var(--text-muted); line-height:1.6; margin-bottom:10px; }
+        .feedback-admin-date { font-size:0.78rem; color:var(--text-muted); font-family:'Share Tech Mono',monospace; margin-bottom:10px; }
+        .feedback-admin-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .feedback-reply-box { margin-top:10px; display:flex; gap:8px; }
+        .feedback-reply-box input { flex:1; padding:10px; background:var(--dark); border:1px solid rgba(204,0,0,0.3); border-radius:6px; color:var(--text); }
+        .feedback-reply-box input:focus { outline:none; border-color:var(--primary); }
+        .feedback-existing-reply {
+            background:rgba(204,0,0,0.05); border-left:3px solid var(--primary);
+            padding:10px 15px; margin-top:10px; border-radius:0 6px 6px 0;
         }
+        .feedback-existing-reply strong { color:var(--primary-bright); font-family:'Orbitron',sans-serif; font-size:0.8rem; }
 
-        /* ── TABLE ──────────────────────────────────────── */
-        table { width: 100%; background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid rgba(204,0,0,0.15); }
-        table thead { background: var(--dark); }
-        table th {
-            padding: 13px;
-            text-align: left;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.82rem;
-            color: var(--primary-bright);
-            letter-spacing: 1px;
-        }
-        table td { padding: 12px 13px; font-size: 0.88rem; color: var(--text-muted); }
-        table tbody tr { border-bottom: 1px solid rgba(204,0,0,0.1); transition: background 0.2s; }
-        table tbody tr:hover { background: rgba(204,0,0,0.04); }
-
-        /* ── TUTORIAL ITEM ──────────────────────────────── */
-        .tutorial-item {
-            background: var(--dark);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(204,0,0,0.15);
-            transition: all 0.3s;
-        }
-
-        .tutorial-item:hover { border-color: rgba(204,0,0,0.35); }
-
-        .tutorial-item-info h4 {
-            color: var(--text);
-            font-size: 0.95rem;
-            margin-bottom: 4px;
-        }
-
-        .tutorial-item-info small {
-            color: var(--text-muted);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.78rem;
-        }
-
-        /* ── RESPONSIVE ─────────────────────────────────── */
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .button-item { flex-direction: column; align-items: stretch; }
+        @media (max-width:768px) {
+            .admin-layout { flex-direction:column; }
+            .sidebar { width:100%; display:flex; overflow-x:auto; padding:10px 0; }
+            .sidebar-item { white-space:nowrap; border-left:none; border-bottom:3px solid transparent; }
+            .sidebar-item.active { border-bottom-color:var(--primary); }
         }
     </style>
 </head>
 <body>
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
-            <div class="login-logo">
-                <h1>GFX GAMER LAB</h1>
-                <p>[ ADMIN ACCESS TERMINAL ]</p>
-            </div>
-            <div class="error-msg" id="loginError">❌ Wrong email or password!</div>
-            <form id="loginForm" onsubmit="return handleLogin(event)">
-                <div class="form-group">
-                    <label>EMAIL</label>
-                    <input type="email" id="loginEmail" required placeholder="admin@gfxgamerlab.com">
-                </div>
-                <div class="form-group">
-                    <label>PASSWORD</label>
-                    <input type="password" id="loginPassword" required placeholder="••••••••••••">
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">ENTER PANEL ➤</button>
-            </form>
+            <h2>ADMIN LOGIN</h2>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button onclick="login()">LOGIN</button>
+            <p class="login-error" id="loginError"></p>
         </div>
     </div>
-    
-    <div class="admin-container" id="adminContainer">
+
+    <div class="admin-panel" id="adminPanel">
         <div class="admin-header">
-            <div class="admin-title"><h2>⚡ ADMIN PANEL</h2></div>
-            <div class="admin-actions">
-                <a href="index.html" class="btn btn-primary" target="_blank">🌐 View Site</a>
-                <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+            <h1>GFX GAMER LAB — ADMIN</h1>
+            <div>
+                <button onclick="window.open('/','_blank')">View Site</button>
+                <button onclick="logout()" style="margin-left:8px;background:rgba(204,0,0,0.15);border:1px solid var(--danger);color:var(--danger);">Logout</button>
             </div>
         </div>
-        
         <div class="admin-layout">
-            <aside class="sidebar">
-                <ul class="sidebar-nav">
-                    <li><a href="#" onclick="showSection('dashboard')" class="active">📊 Dashboard</a></li>
-                    <li><a href="#" onclick="showSection('analytics')">📈 Analytics</a></li>
-                    <li><a href="#" onclick="showSection('addPost')">➕ Add Post</a></li>
-                    <li><a href="#" onclick="showSection('managePosts')">📋 Manage Posts</a></li>
-                    <li><a href="#" onclick="showSection('tutorials')">📺 Tutorials</a></li>
-                    <li><a href="#" onclick="showSection('social')">📱 Social Links</a></li>
-                    <li><a href="#" onclick="showSection('ads')">📢 Ads</a></li>
-                    <li><a href="#" onclick="showSection('settings')">⚙️ Settings</a></li>
-                </ul>
-            </aside>
-            
-            <main class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-item active" data-section="posts" onclick="switchSection('posts',this)">&#128196; Posts</div>
+                <div class="sidebar-item" data-section="tutorials" onclick="switchSection('tutorials',this)">&#127909; Tutorials</div>
+                <div class="sidebar-item" data-section="social" onclick="switchSection('social',this)">&#127760; Social Links</div>
+                <div class="sidebar-item" data-section="ads" onclick="switchSection('ads',this)">&#128184; Ads Settings</div>
+                <div class="sidebar-item" data-section="site" onclick="switchSection('site',this)">&#9881; Site Settings</div>
+                <div class="sidebar-item" data-section="analytics" onclick="switchSection('analytics',this)">&#128202; Analytics</div>
+                <div class="sidebar-item" data-section="feedback" onclick="switchSection('feedback',this)">&#128172; Feedback</div>
+            </div>
+            <div class="content-area">
 
-                <!-- ── DASHBOARD ──────────────────────────── -->
-                <section id="dashboard" class="section active">
-                    <h2>📊 DASHBOARD</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-value" id="dashTotalPosts">0</div><div class="stat-label">POSTS</div></div>
-                        <div class="stat-card"><div class="stat-value" id="dashTotalDownloads">0</div><div class="stat-label">DOWNLOADS</div></div>
-                        <div class="stat-card"><div class="stat-value" id="dashTodayVisits">0</div><div class="stat-label">TODAY VISITS</div></div>
-                        <div class="stat-card"><div class="stat-value" id="dashMonthVisits">0</div><div class="stat-label">MONTH VISITS</div></div>
-                    </div>
-                </section>
-                
-                <!-- ── ANALYTICS ──────────────────────────── -->
-                <section id="analytics" class="section">
-                    <h2>📈 ANALYTICS</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-value" id="analyticsToday">0</div><div class="stat-label">TODAY</div></div>
-                        <div class="stat-card"><div class="stat-value" id="analyticsWeek">0</div><div class="stat-label">THIS WEEK</div></div>
-                        <div class="stat-card"><div class="stat-value" id="analyticsMonth">0</div><div class="stat-label">THIS MONTH</div></div>
-                        <div class="stat-card"><div class="stat-value" id="analyticsTotal">0</div><div class="stat-label">ALL TIME</div></div>
-                    </div>
-                    <div class="chart-container"><h3>📅 Last 7 Days Visits</h3><canvas id="visitsChart"></canvas></div>
-                    <div class="chart-container"><h3>🌍 Top Countries</h3><canvas id="countriesChart"></canvas></div>
-                    <div class="card">
-                        <h3>🔗 Traffic Sources</h3>
-                        <table>
-                            <thead><tr><th>Source</th><th>Visits</th><th>Percentage</th></tr></thead>
-                            <tbody id="sourcesTableBody"><tr><td colspan="3">Loading...</td></tr></tbody>
-                        </table>
-                    </div>
-                </section>
-                
-                <!-- ── ADD POST ───────────────────────────── -->
-                <section id="addPost" class="section">
-                    <h2>➕ ADD POST</h2>
-                    <div class="card">
-                        <form id="postForm" onsubmit="return savePost(event)">
+                <div class="content-section active" id="sec-posts">
+                    <h2 class="section-title">MANAGE POSTS</h2>
+                    <button class="btn btn-primary" onclick="showPostForm()">+ Add New Post</button>
+                    <div id="postFormArea" style="display:none;margin-top:20px;">
+                        <div class="card">
                             <input type="hidden" id="editPostId">
-                            
-                            <div class="form-group">
-                                <label>TITLE *</label>
-                                <input type="text" id="postTitle" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>DESCRIPTION</label>
-                                <textarea id="postDescription" rows="5" placeholder="Write full description here. It will show in full on the website with Read More button."></textarea>
-                                <small style="color:var(--text-muted);">Full description dikhai degi — users Read More button se poori padh sakenge.</small>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>🖼️ THUMBNAIL URL *</label>
-                                <input type="url" id="thumbnailUrl" placeholder="https://i.ibb.co/... (from imgbb.com)" required>
-                                <small style="color:var(--text-muted);">imgbb.com pe upload karein aur direct image URL yahan paste karein</small>
-                            </div>
-                            
-                            <div class="section-header">
-                                <h4>🎬 VIDEO (Optional)</h4>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>🔗 YOUTUBE LINK</label>
-                                <input type="url" id="youtubeLink" placeholder="https://youtube.com/watch?v=...">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>📹 DIRECT VIDEO URL (MP4, WebM, etc.)</label>
-                                <input type="url" id="directVideoUrl" placeholder="https://example.com/video.mp4">
-                            </div>
-                            
-                            <div class="section-header">
-                                <h4>⬇️ DOWNLOAD BUTTONS (Unlimited)</h4>
-                                <p>Jitne chahein download buttons add karein. Pehle click pe ad show hoga!</p>
-                            </div>
-                            
-                            <div id="downloadButtonsList" class="button-list"></div>
-                            <button type="button" class="add-button-btn" onclick="addDownloadButton()">+ ADD DOWNLOAD BUTTON</button>
-                            
-                            <div class="section-header" style="margin-top:25px;">
-                                <h4>🔗 EXTRA BUTTONS (Optional)</h4>
-                                <p>Apply Process, Facebook, Telegram links — pehle click pe ad show hoga!</p>
-                            </div>
-                            
-                            <div id="extraButtonsList" class="button-list"></div>
-                            <button type="button" class="add-button-btn" onclick="addExtraButton()">+ ADD EXTRA BUTTON</button>
-                            
-                            <div class="section-header" style="margin-top:25px;">
-                                <h4>🔍 SEO TAGS</h4>
-                                <p>Tags se post Google mein easily milegi aur website pe filter hogi</p>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>CATEGORY TAG</label>
-                                <select id="postCategory">
-                                    <option value="">-- Select Category --</option>
-                                    <option value="CONFIG">CONFIG</option>
-                                    <option value="GFX TOOL">GFX TOOL</option>
-                                    <option value="SENSITIVITY">SENSITIVITY</option>
-                                    <option value="VIP FILE">VIP FILE</option>
-                                    <option value="TUTORIAL">TUTORIAL</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>SEO KEYWORDS (comma separated)</label>
-                                <input type="text" id="seoTags" placeholder="config, gfx tool, pubg, 90fps, lag fix">
-                                <small style="color:var(--text-muted);">Yeh website pe post ke neeche tags ki tarah dikhenge</small>
-                            </div>
-                            
-                            <div style="display:flex;gap:15px;margin-top:28px;">
-                                <button type="submit" class="btn btn-success">💾 SAVE POST</button>
-                                <button type="button" class="btn" onclick="clearPostForm()" style="background:rgba(255,255,255,0.06);color:var(--text);border:1px solid rgba(255,255,255,0.1);">🗑️ CLEAR</button>
-                            </div>
-                        </form>
-                    </div>
-                </section>
-                
-                <!-- ── MANAGE POSTS ────────────────────────── -->
-                <section id="managePosts" class="section">
-                    <h2>📋 MANAGE POSTS</h2>
-                    <div id="postsListContainer">Loading...</div>
-                </section>
+                            <div class="form-group"><label>Title</label><input id="postTitle"></div>
+                            <div class="form-group"><label>Description</label><textarea id="postDescription"></textarea></div>
+                            <div class="form-group"><label>Thumbnail URL</label><input id="postThumbnail"></div>
+                            <div class="form-group"><label>Tags (comma separated)</label><input id="postTags" placeholder="config, gfx tool, sensitivity, vip file"></div>
+                            <div class="form-group"><label>YouTube Link (optional)</label><input id="postYoutubeLink"></div>
+                            <div class="form-group"><label>Direct Video URL (optional)</label><input id="postDirectVideoUrl"></div>
 
-                <!-- ── TUTORIALS ──────────────────────────── -->
-                <section id="tutorials" class="section">
-                    <h2>📺 TUTORIALS</h2>
-                    <div class="card">
-                        <h3>➕ ADD TUTORIAL</h3>
-                        <form id="tutorialForm" onsubmit="return saveTutorial(event)">
+                            <div class="form-group">
+                                <label>Download Buttons</label>
+                                <div id="dlBtnContainer"></div>
+                                <button class="btn btn-info" type="button" onclick="addDlBtn()">+ Add Download Button</button>
+                            </div>
+                            <div class="form-group">
+                                <label>Extra Buttons (links)</label>
+                                <div id="extraBtnContainer"></div>
+                                <button class="btn btn-info" type="button" onclick="addExtraBtn()">+ Add Extra Button</button>
+                            </div>
+                            <button class="btn btn-primary" onclick="savePost()">Save Post</button>
+                            <button class="btn btn-danger" onclick="hidePostForm()">Cancel</button>
+                        </div>
+                    </div>
+                    <div id="postsList" style="margin-top:20px;"></div>
+                </div>
+
+                <div class="content-section" id="sec-tutorials">
+                    <h2 class="section-title">MANAGE TUTORIALS</h2>
+                    <button class="btn btn-primary" onclick="showTutorialForm()">+ Add Tutorial</button>
+                    <div id="tutorialFormArea" style="display:none;margin-top:20px;">
+                        <div class="card">
                             <input type="hidden" id="editTutorialId">
-                            <div class="form-group">
-                                <label>TUTORIAL TITLE *</label>
-                                <input type="text" id="tutorialTitle" required placeholder="Tutorial ka naam likhen...">
-                            </div>
-                            <div class="form-group">
-                                <label>YOUTUBE VIDEO LINK *</label>
-                                <input type="url" id="tutorialYoutubeLink" required placeholder="https://youtube.com/watch?v=...">
-                                <small style="color:var(--text-muted);">YouTube video ka full URL paste karein</small>
-                            </div>
-                            <div style="display:flex;gap:15px;margin-top:20px;">
-                                <button type="submit" class="btn btn-success">💾 SAVE TUTORIAL</button>
-                                <button type="button" onclick="clearTutorialForm()" style="padding:11px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);border-radius:6px;cursor:pointer;font-family:'Share Tech Mono',monospace;">🗑️ CLEAR</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card" style="margin-top:20px;">
-                        <h3>📋 ALL TUTORIALS</h3>
-                        <div id="tutorialsListContainer">
-                            <p style="color:var(--text-muted);font-family:'Share Tech Mono',monospace;font-size:0.85rem;">Loading tutorials...</p>
+                            <div class="form-group"><label>Title</label><input id="tutorialTitle"></div>
+                            <div class="form-group"><label>YouTube Link</label><input id="tutorialYoutubeLink"></div>
+                            <button class="btn btn-primary" onclick="saveTutorial()">Save Tutorial</button>
+                            <button class="btn btn-danger" onclick="hideTutorialForm()">Cancel</button>
                         </div>
                     </div>
-                </section>
-                
-                <!-- ── SOCIAL LINKS ────────────────────────── -->
-                <section id="social" class="section">
-                    <h2>📱 SOCIAL LINKS</h2>
-                    <div class="card">
-                        <form id="socialForm" onsubmit="return saveSocialLinks(event)">
-                            <div class="form-group">
-                                <label>▶ YOUTUBE</label>
-                                <input type="url" id="socialYoutube">
-                            </div>
-                            <div class="form-group">
-                                <label>✈ TELEGRAM</label>
-                                <input type="url" id="socialTelegram">
-                            </div>
-                            <div class="form-group">
-                                <label>💬 WHATSAPP</label>
-                                <input type="url" id="socialWhatsapp">
-                            </div>
-                            <button type="submit" class="btn btn-success">💾 SAVE</button>
-                        </form>
-                    </div>
-                </section>
-                
-                <!-- ── ADS ────────────────────────────────── -->
-                <section id="ads" class="section">
-                    <h2>📢 ADS MANAGEMENT</h2>
-                    <div class="ad-help" style="margin-bottom:20px;">
-                        <strong>Adsterra Se Ad Code Kaise Lagayein:</strong><br><br>
-                        1. Adsterra.com pe login karein<br>
-                        2. <strong>Publishers → Sites → Add Site</strong> karein<br>
-                        3. Site verify hone ke baad <strong>Ad Units → Create New</strong><br>
-                        4. Type chunein: <strong>Display Banner</strong> (300x250 ya 728x90)<br>
-                        5. Jo HTML/Script code mile woh neeche textbox mein paste karein<br>
-                        6. <strong>Show toggle ON</strong> karein aur Save karein<br><br>
-                        <strong>Smartlink:</strong> Adsterra → Publishers → Smartlinks se link copy karein
-                    </div>
-                    
-                    <form id="adsForm" onsubmit="return saveAds(event)">
-                        <div class="ad-section">
-                            <h4>🔗 SMARTLINK (Download Buttons — 1st Click Ad)</h4>
-                            <div class="form-group">
-                                <label>Smartlink URL</label>
-                                <input type="url" id="smartlink" placeholder="https://youradurl.com/smartlink/...">
-                            </div>
-                            <div class="form-group">
-                                <label><input type="checkbox" id="smartlinkEnabled"> Enable</label>
-                            </div>
-                            <div class="ad-help">⭐ Jab user kisi DOWNLOAD button pe pehli baar click kare to yeh link khulta hai (sirf 1 baar per button)</div>
-                        </div>
-                        
-                        <div class="ad-section">
-                            <h4>🔗 EXTERNAL LINK AD (Extra Buttons — 1st Click Ad)</h4>
-                            <div class="form-group">
-                                <label>External Link Ad URL</label>
-                                <input type="url" id="externalLinkAd" placeholder="https://youradurl.com/...">
-                            </div>
-                            <div class="form-group">
-                                <label><input type="checkbox" id="externalLinkAdEnabled"> Enable</label>
-                            </div>
-                            <div class="ad-help">⭐ Jab user Extra Button (Apply Process, Facebook, etc.) pe pehli baar click kare</div>
-                        </div>
-                        
-                        <div class="ad-section">
-                            <h4>1️⃣ TOP BANNER (Page ke bilkul upar)</h4>
-                            <div class="form-group">
-                                <label>Adsterra Banner Code (HTML/Script)</label>
-                                <textarea id="topBanner" rows="6" placeholder="Adsterra se mila hua script/html code yahan paste karein..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label><input type="checkbox" id="topBannerEnabled"> Show</label>
-                            </div>
-                        </div>
-                        
-                        <div class="ad-section">
-                            <h4>2️⃣ BELOW HERO (Hero section ke neechay)</h4>
-                            <div class="form-group">
-                                <label>Adsterra Banner Code</label>
-                                <textarea id="belowHero" rows="6" placeholder="Adsterra se mila hua script/html code..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label><input type="checkbox" id="belowHeroEnabled"> Show</label>
-                            </div>
-                        </div>
-                        
-                        <div class="ad-section">
-                            <h4>3️⃣ IN-CONTENT (Posts grid ke upar + Modal mein)</h4>
-                            <div class="form-group">
-                                <label>Adsterra Banner Code</label>
-                                <textarea id="inContent" rows="6" placeholder="Adsterra se mila hua script/html code..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label><input type="checkbox" id="inContentEnabled"> Show</label>
-                            </div>
-                        </div>
-                        
-                        <div class="ad-section">
-                            <h4>4️⃣ PRE-DOWNLOAD (Download countdown mein dikhega)</h4>
-                            <div class="form-group">
-                                <label>Adsterra Banner Code</label>
-                                <textarea id="preDownload" rows="6" placeholder="Adsterra se mila hua script/html code..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label><input type="checkbox" id="preDownloadEnabled"> Show</label>
-                            </div>
-                            <div class="ad-help">⭐ Yeh ad countdown modal mein dikhega jab user download karne ki koshish kare</div>
-                        </div>
-                        
-                        <div class="ad-section">
-                            <h4>5️⃣ FOOTER (Page ke sab se neechay)</h4>
-                            <div class="form-group">
-                                <label>Adsterra Banner Code</label>
-                                <textarea id="footerAd" rows="6" placeholder="Adsterra se mila hua script/html code..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label><input type="checkbox" id="footerEnabled"> Show</label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success btn-full">💾 SAVE ALL ADS</button>
-                    </form>
-                </section>
-                
-                <!-- ── SETTINGS ────────────────────────────── -->
-                <section id="settings" class="section">
-                    <h2>⚙️ SETTINGS</h2>
-                    <div class="card">
-                        <form id="settingsForm" onsubmit="return saveSettings(event)">
-                            <div class="section-header">
-                                <h4>🖼️ SITE BASICS</h4>
-                            </div>
-                            <div class="form-group">
-                                <label>LOGO URL *</label>
-                                <input type="url" id="logoUrl" placeholder="https://i.ibb.co/... (imgbb.com se)" required>
-                                <small style="color:var(--text-muted);">imgbb.com pe upload karein, direct image link copy karke yahan paste karein</small>
-                            </div>
-                            <div class="form-group">
-                                <label>HERO DESCRIPTION</label>
-                                <textarea id="heroDescription" rows="3" placeholder="Website ka main tagline / description..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>ANNOUNCEMENT TEXT (● se alag karein)</label>
-                                <input type="text" id="announcementText" placeholder="🔥 New Config Added! ● ⚡ 90FPS Available ● 💎 VIP Updated!">
-                            </div>
-                            <div class="section-header" style="margin-top:22px;">
-                                <h4>🔍 SEO SETTINGS</h4>
-                            </div>
-                            <div class="form-group">
-                                <label>META TITLE</label>
-                                <input type="text" id="metaTitle" placeholder="GFX Gamer Lab — Free PUBG Mobile Resources">
-                                <div class="seo-note">✅ 50-60 characters best hain. Main keyword pehle likhin.</div>
-                            </div>
-                            <div class="form-group">
-                                <label>META DESCRIPTION</label>
-                                <textarea id="metaDescription" rows="3" placeholder="Your ultimate destination for PUBG Mobile pro configs, GFX tools & premium gaming resources."></textarea>
-                                <div class="seo-note">✅ 150-160 characters best hain. Yeh Google search results mein dikhai deta hai.</div>
-                            </div>
-                            <div class="form-group">
-                                <label>META KEYWORDS</label>
-                                <input type="text" id="metaKeywords" placeholder="PUBG Mobile, GFX Tool, Config, Sensitivity, 90FPS, Free Download">
-                                <div class="seo-note">✅ Best keywords: PUBG Mobile Config, GFX Tool Download, PUBG Sensitivity, 90FPS Config</div>
-                            </div>
-                            <div style="margin-top:28px;">
-                                <button type="submit" class="btn btn-success">💾 SAVE SETTINGS</button>
-                            </div>
-                        </form>
-                    </div>
-                </section>
+                    <div id="tutorialsList" style="margin-top:20px;"></div>
+                </div>
 
-            </main>
+                <div class="content-section" id="sec-social">
+                    <h2 class="section-title">SOCIAL LINKS</h2>
+                    <div class="card">
+                        <div class="form-group"><label>YouTube Channel URL</label><input id="socialYoutube"></div>
+                        <div class="form-group"><label>Telegram Channel URL</label><input id="socialTelegram"></div>
+                        <div class="form-group"><label>WhatsApp Group URL</label><input id="socialWhatsapp"></div>
+                        <div class="form-group"><label>TikTok Profile URL</label><input id="socialTiktok"></div>
+                        <div class="form-group"><label>Facebook Page URL</label><input id="socialFacebook"></div>
+                        <button class="btn btn-primary" onclick="saveSocial()">Save Social Links</button>
+                    </div>
+                </div>
+
+                <div class="content-section" id="sec-ads">
+                    <h2 class="section-title">ADS SETTINGS</h2>
+                    <div class="card">
+                        <div class="form-group"><label>Smartlink URL (for download ads)</label><input id="adsSmartlink"></div>
+                        <div class="checkbox-group"><input type="checkbox" id="adsSmartlinkEnabled"><label for="adsSmartlinkEnabled">Enable Smartlink</label></div>
+
+                        <div class="form-group"><label>External Link Ad URL</label><input id="adsExternalLinkAd"></div>
+                        <div class="checkbox-group"><input type="checkbox" id="adsExternalLinkAdEnabled"><label for="adsExternalLinkAdEnabled">Enable External Link Ad</label></div>
+
+                        <div class="form-group"><label>Promo Button 1 Link (colorful button)</label><input id="adsPromoLink1"></div>
+                        <div class="form-group"><label>Promo Button 2 Link (colorful button)</label><input id="adsPromoLink2"></div>
+
+                        <hr style="border-color:rgba(204,0,0,0.2);margin:20px 0;">
+
+                        <div class="form-group"><label>Top Banner Ad Code</label><textarea id="adsTopBanner"></textarea></div>
+                        <div class="checkbox-group"><input type="checkbox" id="adsTopBannerEnabled"><label for="adsTopBannerEnabled">Enable Top Banner</label></div>
+
+                        <div class="form-group"><label>Below Hero Ad Code</label><textarea id="adsBelowHero"></textarea></div>
+                        <div class="checkbox-group"><input type="checkbox" id="adsBelowHeroEnabled"><label for="adsBelowHeroEnabled">Enable Below Hero</label></div>
+
+                        <div class="form-group"><label>In-Content Ad Code</label><textarea id="adsInContent"></textarea></div>
+                        <div class="checkbox-group"><input type="checkbox" id="adsInContentEnabled"><label for="adsInContentEnabled">Enable In-Content</label></div>
+
+                        <div class="form-group"><label>Pre-Download Ad Code</label><textarea id="adsPreDownload"></textarea></div>
+                        <div class="checkbox-group"><input type="checkbox" id="adsPreDownloadEnabled"><label for="adsPreDownloadEnabled">Enable Pre-Download</label></div>
+
+                        <div class="form-group"><label>Footer Ad Code</label><textarea id="adsFooter"></textarea></div>
+                        <div class="checkbox-group"><input type="checkbox" id="adsFooterEnabled"><label for="adsFooterEnabled">Enable Footer</label></div>
+
+                        <button class="btn btn-primary" onclick="saveAds()">Save Ads Settings</button>
+                    </div>
+                </div>
+
+                <div class="content-section" id="sec-site">
+                    <h2 class="section-title">SITE SETTINGS</h2>
+                    <div class="card">
+                        <div class="form-group"><label>Site Logo URL</label><input id="siteLogo"></div>
+                        <div class="form-group"><label>Hero Description</label><textarea id="siteHeroDesc"></textarea></div>
+                        <div class="form-group"><label>Announcement Text (separate items with bullet ●)</label><textarea id="siteAnnouncement"></textarea></div>
+                        <div class="form-group"><label>Meta Description</label><textarea id="siteMetaDesc"></textarea></div>
+                        <div class="form-group"><label>Meta Keywords</label><input id="siteMetaKeywords"></div>
+                        <button class="btn btn-primary" onclick="saveSiteSettings()">Save Site Settings</button>
+                    </div>
+                </div>
+
+                <div class="content-section" id="sec-analytics">
+                    <h2 class="section-title">ANALYTICS</h2>
+                    <div class="analytics-grid">
+                        <div class="analytics-card"><div class="analytics-value" id="anTodayVisits">0</div><div class="analytics-label">Today Visits</div></div>
+                        <div class="analytics-card"><div class="analytics-value" id="anMonthVisits">0</div><div class="analytics-label">This Month</div></div>
+                        <div class="analytics-card"><div class="analytics-value" id="anTotalVisits">0</div><div class="analytics-label">Total Visits</div></div>
+                        <div class="analytics-card"><div class="analytics-value" id="anTotalDownloads">0</div><div class="analytics-label">Downloads</div></div>
+                    </div>
+                    <h3 style="color:var(--primary-bright);margin-bottom:15px;font-family:'Share Tech Mono',monospace;">Recent Visits</h3>
+                    <div id="recentVisits"></div>
+                </div>
+
+                <div class="content-section" id="sec-feedback">
+                    <h2 class="section-title">MANAGE FEEDBACK</h2>
+                    <div id="feedbackAdminList"></div>
+                </div>
+
+            </div>
         </div>
     </div>
-    
+
+    <div class="toast" id="toast"></div>
+
     <script>
-        const firebaseConfig = {
+        var firebaseConfig = {
             apiKey: "AIzaSyAAAUPBlG6m5n64clCreX7ntfBuTLfPJ_c",
             authDomain: "gfx-gamer-lab-31017.firebaseapp.com",
-            projectId: "gfx-gamer-lab-31017"
+            projectId: "gfx-gamer-lab-31017",
+            storageBucket: "gfx-gamer-lab-31017.appspot.com"
         };
-        
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
-        const ADMIN_EMAIL = "nisarahmad.salihi752@gmail.com";
-        const ADMIN_PASSWORD = "nisar03746906@N";
-        
-        let downloadButtons = [];
-        let extraButtons = [];
-        
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('gfx_admin_logged_in') === 'true') {
+        var db = firebase.firestore();
+        var auth = firebase.auth();
+
+        function showToast(msg, type) {
+            var t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast ' + type + ' show';
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        function escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        async function login() {
+            var email = document.getElementById('loginEmail').value;
+            var pw = document.getElementById('loginPassword').value;
+            var errEl = document.getElementById('loginError');
+            try {
+                await auth.signInWithEmailAndPassword(email, pw);
                 document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminContainer').style.display = 'block';
-                loadDashboard();
+                document.getElementById('adminPanel').style.display = 'block';
+                loadAllData();
+            } catch (e) {
+                errEl.textContent = e.message; errEl.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            auth.signOut();
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadAllData();
             }
         });
-        
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                localStorage.setItem('gfx_admin_logged_in', 'true');
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminContainer').style.display = 'block';
-                loadDashboard();
+
+        function switchSection(name, el) {
+            document.querySelectorAll('.sidebar-item').forEach(function(s) { s.classList.remove('active'); });
+            el.classList.add('active');
+            document.querySelectorAll('.content-section').forEach(function(s) { s.classList.remove('active'); });
+            document.getElementById('sec-' + name).classList.add('active');
+            if (name === 'analytics') loadAnalytics();
+            if (name === 'feedback') loadFeedbackAdmin();
+        }
+
+        function loadAllData() {
+            loadPosts();
+            loadTutorials();
+            loadSocial();
+            loadAds();
+            loadSiteSettings();
+            loadAnalytics();
+            loadFeedbackAdmin();
+        }
+
+        var dlBtnCount = 0;
+        function addDlBtn(title, url) {
+            dlBtnCount++;
+            var row = document.createElement('div');
+            row.className = 'dl-btn-row';
+            row.id = 'dlBtn_' + dlBtnCount;
+            row.innerHTML = '<input placeholder="Button Title" value="' + escHtml(title || '') + '">' +
+                '<input placeholder="Download URL" value="' + escHtml(url || '') + '">' +
+                '<button class="btn btn-danger" onclick="this.parentElement.remove()">X</button>';
+            document.getElementById('dlBtnContainer').appendChild(row);
+        }
+
+        var extraBtnCount = 0;
+        function addExtraBtn(title, url) {
+            extraBtnCount++;
+            var row = document.createElement('div');
+            row.className = 'dl-btn-row';
+            row.id = 'extraBtn_' + extraBtnCount;
+            row.innerHTML = '<input placeholder="Button Title" value="' + escHtml(title || '') + '">' +
+                '<input placeholder="URL" value="' + escHtml(url || '') + '">' +
+                '<button class="btn btn-danger" onclick="this.parentElement.remove()">X</button>';
+            document.getElementById('extraBtnContainer').appendChild(row);
+        }
+
+        function showPostForm(post) {
+            document.getElementById('postFormArea').style.display = 'block';
+            document.getElementById('dlBtnContainer').innerHTML = '';
+            document.getElementById('extraBtnContainer').innerHTML = '';
+            dlBtnCount = 0; extraBtnCount = 0;
+
+            if (post) {
+                document.getElementById('editPostId').value = post.id;
+                document.getElementById('postTitle').value = post.title || '';
+                document.getElementById('postDescription').value = post.description || '';
+                document.getElementById('postThumbnail').value = post.thumbnailUrl || post.thumbnail || '';
+                document.getElementById('postTags').value = post.tags || '';
+                document.getElementById('postYoutubeLink').value = post.youtubeLink || '';
+                document.getElementById('postDirectVideoUrl').value = post.directVideoUrl || '';
+                if (post.downloadButtons && post.downloadButtons.length) {
+                    post.downloadButtons.forEach(function(b) { addDlBtn(b.title, b.url); });
+                } else {
+                    if (post.downloadLink) addDlBtn(post.downloadLinkTitle || 'Download', post.downloadLink);
+                    if (post.altDownloadLink) addDlBtn(post.altDownloadLinkTitle || 'Download 2', post.altDownloadLink);
+                }
+                if (post.extraButtons && post.extraButtons.length) {
+                    post.extraButtons.forEach(function(b) { addExtraBtn(b.title, b.url); });
+                }
             } else {
-                const err = document.getElementById('loginError');
-                err.style.display = 'block';
-                setTimeout(() => { err.style.display = 'none'; }, 3000);
+                document.getElementById('editPostId').value = '';
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postDescription').value = '';
+                document.getElementById('postThumbnail').value = '';
+                document.getElementById('postTags').value = '';
+                document.getElementById('postYoutubeLink').value = '';
+                document.getElementById('postDirectVideoUrl').value = '';
+                addDlBtn();
             }
-            return false;
         }
-        
-        function logout() {
-            localStorage.removeItem('gfx_admin_logged_in');
-            location.reload();
+
+        function hidePostForm() {
+            document.getElementById('postFormArea').style.display = 'none';
         }
-        
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-            event.target.classList.add('active');
-            if (sectionId === 'dashboard') loadDashboard();
-            if (sectionId === 'analytics') loadAnalytics();
-            if (sectionId === 'managePosts') loadPostsList();
-            if (sectionId === 'tutorials') loadTutorialsList();
-            if (sectionId === 'social') loadSocialLinks();
-            if (sectionId === 'ads') loadAds();
-            if (sectionId === 'settings') loadSiteSettings();
-        }
-        
-        // ── Dashboard ─────────────────────────────────────────────────────────
-        async function loadDashboard() {
-            try {
-                const postsSnap = await db.collection('posts').get();
-                document.getElementById('dashTotalPosts').textContent = postsSnap.size;
-                const dlSnap = await db.collection('analytics').where('type','==','download').get();
-                let totalDl = 0;
-                dlSnap.forEach(d => { totalDl += (d.data().count || 1); });
-                document.getElementById('dashTotalDownloads').textContent = totalDl;
-                const today = new Date().toISOString().split('T')[0];
-                const todayDoc = await db.collection('analytics').doc(`visits_${today}`).get();
-                document.getElementById('dashTodayVisits').textContent = todayDoc.exists ? (todayDoc.data().count || 0) : 0;
-                const currentMonth = new Date().toISOString().slice(0, 7);
-                const monthSnap = await db.collection('analytics').where('type','==','visit').where('month','==',currentMonth).get();
-                let monthTotal = 0;
-                monthSnap.forEach(d => { monthTotal += (d.data().count || 0); });
-                document.getElementById('dashMonthVisits').textContent = monthTotal;
-            } catch (e) { console.error(e); }
-        }
-        
-        // ── Analytics ─────────────────────────────────────────────────────────
-        async function loadAnalytics() {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                const currentMonth = new Date().toISOString().slice(0, 7);
-                const todayDoc = await db.collection('analytics').doc(`visits_${today}`).get();
-                document.getElementById('analyticsToday').textContent = todayDoc.exists ? (todayDoc.data().count || 0) : 0;
-                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-                const weekSnap = await db.collection('analytics').where('type','==','visit').where('date','>=',weekAgo.toISOString().split('T')[0]).get();
-                let weekTotal = 0;
-                weekSnap.forEach(d => { weekTotal += (d.data().count || 0); });
-                document.getElementById('analyticsWeek').textContent = weekTotal;
-                const monthSnap = await db.collection('analytics').where('type','==','visit').where('month','==',currentMonth).get();
-                let monthTotal = 0;
-                monthSnap.forEach(d => { monthTotal += (d.data().count || 0); });
-                document.getElementById('analyticsMonth').textContent = monthTotal;
-                const allSnap = await db.collection('analytics').where('type','==','visit').get();
-                let allTotal = 0;
-                allSnap.forEach(d => { allTotal += (d.data().count || 0); });
-                document.getElementById('analyticsTotal').textContent = allTotal;
-                await loadVisitsChart();
-                await loadCountriesChart();
-                await loadSourcesTable();
-            } catch (e) { console.error(e); }
-        }
-        
-        async function loadVisitsChart() {
-            const last7Days = [], visitCounts = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date(); date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                last7Days.push(dateStr);
-                const doc = await db.collection('analytics').doc(`visits_${dateStr}`).get();
-                visitCounts.push(doc.exists ? (doc.data().count || 0) : 0);
-            }
-            const ctx = document.getElementById('visitsChart').getContext('2d');
-            if (window._visitsChart) window._visitsChart.destroy();
-            window._visitsChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: last7Days, datasets: [{ label: 'Visits', data: visitCounts, borderColor: '#cc0000', backgroundColor: 'rgba(204,0,0,0.1)', tension: 0.4, pointBackgroundColor: '#ff3333', pointBorderColor: '#cc0000' }] },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6a8080' }, grid: { color: 'rgba(204,0,0,0.1)' } }, y: { ticks: { color: '#6a8080' }, grid: { color: 'rgba(204,0,0,0.1)' } } } }
+
+        async function savePost() {
+            var id = document.getElementById('editPostId').value;
+            var dlBtns = [];
+            document.querySelectorAll('#dlBtnContainer .dl-btn-row').forEach(function(row) {
+                var inputs = row.querySelectorAll('input');
+                if (inputs[1].value.trim()) {
+                    dlBtns.push({ title: inputs[0].value.trim() || 'Download', url: inputs[1].value.trim() });
+                }
             });
-        }
-        
-        async function loadCountriesChart() {
-            const snap = await db.collection('analytics').where('type','==','visit').get();
-            const countries = {};
-            snap.forEach(d => { const c = d.data().country || 'Unknown'; countries[c] = (countries[c] || 0) + 1; });
-            const sorted = Object.entries(countries).sort((a,b) => b[1]-a[1]).slice(0, 5);
-            const ctx = document.getElementById('countriesChart').getContext('2d');
-            if (window._countriesChart) window._countriesChart.destroy();
-            window._countriesChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: sorted.map(c => c[0]), datasets: [{ label: 'Visits', data: sorted.map(c => c[1]), backgroundColor: 'rgba(204,0,0,0.7)', borderColor: '#cc0000', borderWidth: 1 }] },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6a8080' }, grid: { color: 'rgba(204,0,0,0.1)' } }, y: { ticks: { color: '#6a8080' }, grid: { color: 'rgba(204,0,0,0.1)' } } } }
+            var extraBtns = [];
+            document.querySelectorAll('#extraBtnContainer .dl-btn-row').forEach(function(row) {
+                var inputs = row.querySelectorAll('input');
+                if (inputs[1].value.trim()) {
+                    extraBtns.push({ title: inputs[0].value.trim() || 'Link', url: inputs[1].value.trim() });
+                }
             });
-        }
-        
-        async function loadSourcesTable() {
-            const snap = await db.collection('analytics').where('type','==','visit').get();
-            const sources = {}; let total = 0;
-            snap.forEach(d => { const s = d.data().source || 'Direct'; sources[s] = (sources[s] || 0) + 1; total++; });
-            document.getElementById('sourcesTableBody').innerHTML = Object.entries(sources)
-                .sort((a,b) => b[1]-a[1])
-                .map(([s, c]) => `<tr><td>${s}</td><td>${c}</td><td>${((c/total)*100).toFixed(1)}%</td></tr>`)
-                .join('') || '<tr><td colspan="3" style="color:var(--text-muted)">No data yet</td></tr>';
-        }
-        
-        // ── Download Buttons ──────────────────────────────────────────────────
-        function addDownloadButton() {
-            const id = Date.now();
-            downloadButtons.push({ id, title: '', url: '' });
-            renderDownloadButtons();
-        }
-        function removeDownloadButton(id) {
-            downloadButtons = downloadButtons.filter(b => b.id !== id);
-            renderDownloadButtons();
-        }
-        function renderDownloadButtons() {
-            document.getElementById('downloadButtonsList').innerHTML = downloadButtons.map(btn => `
-                <div class="button-item">
-                    <input type="text" placeholder="Button Title (e.g., ⬇️ DOWNLOAD v1.0)" value="${btn.title}" onchange="updateDownloadButton(${btn.id}, 'title', this.value)">
-                    <input type="url" placeholder="Direct Download URL" value="${btn.url}" onchange="updateDownloadButton(${btn.id}, 'url', this.value)">
-                    <button onclick="removeDownloadButton(${btn.id})">🗑️</button>
-                </div>`).join('');
-        }
-        function updateDownloadButton(id, field, value) {
-            const btn = downloadButtons.find(b => b.id === id);
-            if (btn) btn[field] = value;
-        }
-        
-        // ── Extra Buttons ─────────────────────────────────────────────────────
-        function addExtraButton() {
-            const id = Date.now();
-            extraButtons.push({ id, title: '', url: '' });
-            renderExtraButtons();
-        }
-        function removeExtraButton(id) {
-            extraButtons = extraButtons.filter(b => b.id !== id);
-            renderExtraButtons();
-        }
-        function renderExtraButtons() {
-            document.getElementById('extraButtonsList').innerHTML = extraButtons.map(btn => `
-                <div class="button-item">
-                    <input type="text" placeholder="Button Title (e.g., 📝 Apply Process, 📘 Facebook)" value="${btn.title}" onchange="updateExtraButton(${btn.id}, 'title', this.value)">
-                    <input type="url" placeholder="External URL" value="${btn.url}" onchange="updateExtraButton(${btn.id}, 'url', this.value)">
-                    <button onclick="removeExtraButton(${btn.id})">🗑️</button>
-                </div>`).join('');
-        }
-        function updateExtraButton(id, field, value) {
-            const btn = extraButtons.find(b => b.id === id);
-            if (btn) btn[field] = value;
-        }
-        
-        // ── Save Post ─────────────────────────────────────────────────────────
-        async function savePost(e) {
-            e.preventDefault();
-            const category = document.getElementById('postCategory').value;
-            const tagsInput = document.getElementById('seoTags').value;
-            const combinedTags = [category, tagsInput].filter(t => t.trim()).join(', ');
-            const postData = {
-                title: document.getElementById('postTitle').value,
-                description: document.getElementById('postDescription').value,
-                thumbnailUrl: document.getElementById('thumbnailUrl').value,
-                youtubeLink: document.getElementById('youtubeLink').value,
-                directVideoUrl: document.getElementById('directVideoUrl').value,
-                downloadButtons: downloadButtons.filter(b => b.url).map(b => ({ title: b.title, url: b.url })),
-                extraButtons: extraButtons.filter(b => b.url).map(b => ({ title: b.title, url: b.url })),
-                tags: combinedTags,
-                views: 0,
-                downloads: 0,
+            var data = {
+                title: document.getElementById('postTitle').value.trim(),
+                description: document.getElementById('postDescription').value.trim(),
+                thumbnailUrl: document.getElementById('postThumbnail').value.trim(),
+                tags: document.getElementById('postTags').value.trim(),
+                youtubeLink: document.getElementById('postYoutubeLink').value.trim(),
+                directVideoUrl: document.getElementById('postDirectVideoUrl').value.trim(),
+                downloadButtons: dlBtns,
+                extraButtons: extraBtns,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-            const editId = document.getElementById('editPostId').value;
+            if (!data.title) { showToast('Title is required!', 'error'); return; }
             try {
-                if (editId) {
-                    await db.collection('posts').doc(editId).update(postData);
-                    alert('✅ Post updated!');
+                if (id) {
+                    await db.collection('posts').doc(id).update(data);
+                    showToast('Post updated!', 'success');
                 } else {
-                    postData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection('posts').add(postData);
-                    alert('✅ Post added successfully!');
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    data.views = 0; data.downloads = 0;
+                    await db.collection('posts').add(data);
+                    showToast('Post created!', 'success');
                 }
-                clearPostForm();
-                loadPostsList();
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error saving post: ' + error.message);
-            }
-            return false;
-        }
-        
-        function clearPostForm() {
-            document.getElementById('postForm').reset();
-            document.getElementById('editPostId').value = '';
-            downloadButtons = []; extraButtons = [];
-            renderDownloadButtons(); renderExtraButtons();
-        }
-        
-        // ── Load Posts List ───────────────────────────────────────────────────
-        async function loadPostsList() {
-            try {
-                const snap = await db.collection('posts').orderBy('createdAt', 'desc').get();
-                document.getElementById('postsListContainer').innerHTML = snap.docs.map(doc => {
-                    const p = doc.data();
-                    const dlCount = (p.downloadButtons || []).length;
-                    const exCount = (p.extraButtons || []).length;
-                    return `
-                        <div class="post-item">
-                            <div>
-                                <h4 style="font-size:0.95rem;margin-bottom:4px;">${p.title}</h4>
-                                <small style="color:var(--text-muted);font-family:'Share Tech Mono',monospace;font-size:0.78rem;">
-                                    👁️ ${p.views || 0} views • ⬇️ ${p.downloads || 0} downloads •
-                                    ${dlCount} download buttons • ${exCount} extra buttons
-                                </small>
-                            </div>
-                            <div class="post-actions">
-                                <button class="btn btn-primary" onclick="editPost('${doc.id}')">✏️ Edit</button>
-                                <button class="btn btn-danger" onclick="deletePost('${doc.id}')">🗑️ Delete</button>
-                            </div>
-                        </div>`;
-                }).join('') || '<p style="color:var(--text-muted);font-family:\'Share Tech Mono\',monospace;">No posts yet.</p>';
-            } catch (e) { console.error(e); }
-        }
-        
-        async function editPost(postId) {
-            try {
-                const doc = await db.collection('posts').doc(postId).get();
-                if (!doc.exists) return;
-                const p = doc.data();
-                document.getElementById('editPostId').value = postId;
-                document.getElementById('postTitle').value = p.title || '';
-                document.getElementById('postDescription').value = p.description || '';
-                document.getElementById('thumbnailUrl').value = p.thumbnailUrl || p.thumbnail || '';
-                document.getElementById('youtubeLink').value = p.youtubeLink || '';
-                document.getElementById('directVideoUrl').value = p.directVideoUrl || '';
-                document.getElementById('seoTags').value = p.tags || '';
-                downloadButtons = (p.downloadButtons || []).map((b, i) => ({ id: Date.now() + i, title: b.title || '', url: b.url || '' }));
-                extraButtons = (p.extraButtons || []).map((b, i) => ({ id: Date.now() + i + 1000, title: b.title || '', url: b.url || '' }));
-                renderDownloadButtons();
-                renderExtraButtons();
-                showSection('addPost');
-                document.getElementById('addPost').scrollIntoView({ behavior: 'smooth' });
-            } catch (e) { console.error(e); alert('Error loading post'); }
-        }
-        
-        async function deletePost(postId) {
-            if (!confirm('⚠️ Are you sure you want to delete this post?')) return;
-            try {
-                await db.collection('posts').doc(postId).delete();
-                loadPostsList();
-                alert('✅ Post deleted!');
-            } catch (e) { console.error(e); alert('❌ Error deleting post'); }
+                hidePostForm();
+                loadPosts();
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
         }
 
-        // ── TUTORIALS ─────────────────────────────────────────────────────────
-        async function saveTutorial(e) {
-            e.preventDefault();
-            const title = document.getElementById('tutorialTitle').value.trim();
-            const youtubeLink = document.getElementById('tutorialYoutubeLink').value.trim();
-            const editId = document.getElementById('editTutorialId').value;
-            const tutorialData = {
-                title,
-                youtubeLink,
+        async function deletePost(id) {
+            if (!confirm('Delete this post?')) return;
+            try {
+                await db.collection('posts').doc(id).delete();
+                showToast('Post deleted!', 'success');
+                loadPosts();
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function loadPosts() {
+            try {
+                var snap;
+                try { snap = await db.collection('posts').orderBy('createdAt', 'desc').get(); }
+                catch (_) { snap = await db.collection('posts').get(); }
+                var html = '';
+                snap.forEach(function(doc) {
+                    var p = Object.assign({ id: doc.id }, doc.data());
+                    html += '<div class="post-item">' +
+                        '<img src="' + (p.thumbnailUrl || p.thumbnail || 'https://via.placeholder.com/80x60') + '" onerror="this.src=\'https://via.placeholder.com/80x60\'">' +
+                        '<div class="post-item-info"><div class="post-item-title">' + escHtml(p.title) + '</div>' +
+                        '<div class="post-item-meta">Views: ' + (p.views || 0) + ' | Downloads: ' + (p.downloads || 0) + ' | Tags: ' + escHtml(p.tags || 'none') + '</div></div>' +
+                        '<div class="post-item-actions">' +
+                        '<button class="btn btn-info" onclick=\'showPostForm(' + JSON.stringify(p).replace(/'/g,"\\'") + ')\'>Edit</button>' +
+                        '<button class="btn btn-danger" onclick="deletePost(\'' + p.id + '\')">Delete</button></div></div>';
+                });
+                document.getElementById('postsList').innerHTML = html || '<p style="color:var(--text-muted)">No posts yet.</p>';
+            } catch (e) { document.getElementById('postsList').innerHTML = '<p style="color:var(--danger)">Error loading posts.</p>'; }
+        }
+
+        function showTutorialForm(tutorial) {
+            document.getElementById('tutorialFormArea').style.display = 'block';
+            if (tutorial) {
+                document.getElementById('editTutorialId').value = tutorial.id;
+                document.getElementById('tutorialTitle').value = tutorial.title || '';
+                document.getElementById('tutorialYoutubeLink').value = tutorial.youtubeLink || '';
+            } else {
+                document.getElementById('editTutorialId').value = '';
+                document.getElementById('tutorialTitle').value = '';
+                document.getElementById('tutorialYoutubeLink').value = '';
+            }
+        }
+        function hideTutorialForm() { document.getElementById('tutorialFormArea').style.display = 'none'; }
+
+        async function saveTutorial() {
+            var id = document.getElementById('editTutorialId').value;
+            var data = {
+                title: document.getElementById('tutorialTitle').value.trim(),
+                youtubeLink: document.getElementById('tutorialYoutubeLink').value.trim(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
+            if (!data.title || !data.youtubeLink) { showToast('Title and YouTube link required!', 'error'); return; }
             try {
-                if (editId) {
-                    await db.collection('tutorials').doc(editId).update(tutorialData);
-                    alert('✅ Tutorial updated!');
-                } else {
-                    tutorialData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection('tutorials').add(tutorialData);
-                    alert('✅ Tutorial added!');
-                }
-                clearTutorialForm();
-                loadTutorialsList();
-            } catch (err) {
-                console.error(err);
-                alert('❌ Error: ' + err.message);
-            }
-            return false;
+                if (id) { await db.collection('tutorials').doc(id).update(data); showToast('Tutorial updated!', 'success'); }
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('tutorials').add(data); showToast('Tutorial added!', 'success'); }
+                hideTutorialForm(); loadTutorials();
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
         }
 
-        async function loadTutorialsList() {
-            const container = document.getElementById('tutorialsListContainer');
-            try {
-                const snap = await db.collection('tutorials').orderBy('createdAt', 'desc').get();
-                if (snap.empty) {
-                    container.innerHTML = '<p style="color:var(--text-muted);font-family:\'Share Tech Mono\',monospace;font-size:0.85rem;">No tutorials yet. Add one above!</p>';
-                    return;
-                }
-                container.innerHTML = snap.docs.map(doc => {
-                    const t = doc.data();
-                    return `
-                    <div class="tutorial-item">
-                        <div class="tutorial-item-info">
-                            <h4>${t.title}</h4>
-                            <small>${t.youtubeLink || ''}</small>
-                        </div>
-                        <div class="post-actions">
-                            <button class="btn btn-primary" onclick="editTutorial('${doc.id}')">✏️ Edit</button>
-                            <button class="btn btn-danger" onclick="deleteTutorial('${doc.id}')">🗑️ Delete</button>
-                        </div>
-                    </div>`;
-                }).join('');
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = '<p style="color:var(--primary-bright)">Error loading tutorials.</p>';
-            }
+        async function deleteTutorial(id) {
+            if (!confirm('Delete this tutorial?')) return;
+            try { await db.collection('tutorials').doc(id).delete(); showToast('Deleted!', 'success'); loadTutorials(); }
+            catch (e) { showToast('Error: ' + e.message, 'error'); }
         }
 
-        async function editTutorial(tutorialId) {
+        async function loadTutorials() {
             try {
-                const doc = await db.collection('tutorials').doc(tutorialId).get();
-                if (!doc.exists) return;
-                const t = doc.data();
-                document.getElementById('editTutorialId').value = tutorialId;
-                document.getElementById('tutorialTitle').value = t.title || '';
-                document.getElementById('tutorialYoutubeLink').value = t.youtubeLink || '';
-                document.getElementById('tutorialForm').scrollIntoView({ behavior: 'smooth' });
-            } catch (e) { console.error(e); alert('Error loading tutorial'); }
+                var snap;
+                try { snap = await db.collection('tutorials').orderBy('createdAt', 'desc').get(); }
+                catch (_) { snap = await db.collection('tutorials').get(); }
+                var html = '';
+                snap.forEach(function(doc) {
+                    var t = Object.assign({ id: doc.id }, doc.data());
+                    html += '<div class="post-item"><div class="post-item-info"><div class="post-item-title">' + escHtml(t.title) + '</div>' +
+                        '<div class="post-item-meta">' + escHtml(t.youtubeLink || '') + '</div></div>' +
+                        '<div class="post-item-actions">' +
+                        '<button class="btn btn-info" onclick=\'showTutorialForm(' + JSON.stringify(t).replace(/'/g,"\\'") + ')\'>Edit</button>' +
+                        '<button class="btn btn-danger" onclick="deleteTutorial(\'' + t.id + '\')">Delete</button></div></div>';
+                });
+                document.getElementById('tutorialsList').innerHTML = html || '<p style="color:var(--text-muted)">No tutorials yet.</p>';
+            } catch (e) { document.getElementById('tutorialsList').innerHTML = '<p style="color:var(--danger)">Error loading tutorials.</p>'; }
         }
 
-        async function deleteTutorial(tutorialId) {
-            if (!confirm('⚠️ Delete this tutorial?')) return;
+        async function loadSocial() {
             try {
-                await db.collection('tutorials').doc(tutorialId).delete();
-                loadTutorialsList();
-                alert('✅ Tutorial deleted!');
-            } catch (e) { console.error(e); alert('❌ Error deleting tutorial'); }
-        }
-
-        function clearTutorialForm() {
-            document.getElementById('tutorialForm').reset();
-            document.getElementById('editTutorialId').value = '';
-        }
-        
-        // ── Social Links ──────────────────────────────────────────────────────
-        async function loadSocialLinks() {
-            try {
-                const doc = await db.collection('settings').doc('social').get();
+                var doc = await db.collection('settings').doc('social').get();
                 if (doc.exists) {
-                    const d = doc.data();
+                    var d = doc.data();
                     document.getElementById('socialYoutube').value = d.youtube || '';
                     document.getElementById('socialTelegram').value = d.telegram || '';
                     document.getElementById('socialWhatsapp').value = d.whatsapp || '';
+                    document.getElementById('socialTiktok').value = d.tiktok || '';
+                    document.getElementById('socialFacebook').value = d.facebook || '';
                 }
             } catch (e) { console.error(e); }
         }
-        
-        async function saveSocialLinks(e) {
-            e.preventDefault();
+
+        async function saveSocial() {
             try {
                 await db.collection('settings').doc('social').set({
-                    youtube: document.getElementById('socialYoutube').value,
-                    telegram: document.getElementById('socialTelegram').value,
-                    whatsapp: document.getElementById('socialWhatsapp').value,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert('✅ Social links saved!');
-            } catch (e) { alert('❌ Error: ' + e.message); }
-            return false;
+                    youtube: document.getElementById('socialYoutube').value.trim(),
+                    telegram: document.getElementById('socialTelegram').value.trim(),
+                    whatsapp: document.getElementById('socialWhatsapp').value.trim(),
+                    tiktok: document.getElementById('socialTiktok').value.trim(),
+                    facebook: document.getElementById('socialFacebook').value.trim()
+                }, { merge: true });
+                showToast('Social links saved!', 'success');
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
         }
-        
-        // ── Ads ───────────────────────────────────────────────────────────────
+
         async function loadAds() {
             try {
-                const doc = await db.collection('settings').doc('ads').get();
+                var doc = await db.collection('settings').doc('ads').get();
                 if (doc.exists) {
-                    const d = doc.data();
-                    document.getElementById('smartlink').value = d.smartlink || '';
-                    document.getElementById('smartlinkEnabled').checked = d.smartlinkEnabled || false;
-                    document.getElementById('externalLinkAd').value = d.externalLinkAd || '';
-                    document.getElementById('externalLinkAdEnabled').checked = d.externalLinkAdEnabled || false;
-                    document.getElementById('topBanner').value = d.topBanner || '';
-                    document.getElementById('topBannerEnabled').checked = d.topBannerEnabled || false;
-                    document.getElementById('belowHero').value = d.belowHero || '';
-                    document.getElementById('belowHeroEnabled').checked = d.belowHeroEnabled || false;
-                    document.getElementById('inContent').value = d.inContent || '';
-                    document.getElementById('inContentEnabled').checked = d.inContentEnabled || false;
-                    document.getElementById('preDownload').value = d.preDownload || '';
-                    document.getElementById('preDownloadEnabled').checked = d.preDownloadEnabled || false;
-                    document.getElementById('footerAd').value = d.footer || '';
-                    document.getElementById('footerEnabled').checked = d.footerEnabled || false;
+                    var d = doc.data();
+                    document.getElementById('adsSmartlink').value = d.smartlink || '';
+                    document.getElementById('adsSmartlinkEnabled').checked = !!d.smartlinkEnabled;
+                    document.getElementById('adsExternalLinkAd').value = d.externalLinkAd || '';
+                    document.getElementById('adsExternalLinkAdEnabled').checked = !!d.externalLinkAdEnabled;
+                    document.getElementById('adsPromoLink1').value = d.promoLink1 || '';
+                    document.getElementById('adsPromoLink2').value = d.promoLink2 || '';
+                    document.getElementById('adsTopBanner').value = d.topBanner || '';
+                    document.getElementById('adsTopBannerEnabled').checked = !!d.topBannerEnabled;
+                    document.getElementById('adsBelowHero').value = d.belowHero || '';
+                    document.getElementById('adsBelowHeroEnabled').checked = !!d.belowHeroEnabled;
+                    document.getElementById('adsInContent').value = d.inContent || '';
+                    document.getElementById('adsInContentEnabled').checked = !!d.inContentEnabled;
+                    document.getElementById('adsPreDownload').value = d.preDownload || '';
+                    document.getElementById('adsPreDownloadEnabled').checked = !!d.preDownloadEnabled;
+                    document.getElementById('adsFooter').value = d.footer || '';
+                    document.getElementById('adsFooterEnabled').checked = !!d.footerEnabled;
                 }
             } catch (e) { console.error(e); }
         }
-        
-        async function saveAds(e) {
-            e.preventDefault();
+
+        async function saveAds() {
             try {
                 await db.collection('settings').doc('ads').set({
-                    smartlink: document.getElementById('smartlink').value,
-                    smartlinkEnabled: document.getElementById('smartlinkEnabled').checked,
-                    externalLinkAd: document.getElementById('externalLinkAd').value,
-                    externalLinkAdEnabled: document.getElementById('externalLinkAdEnabled').checked,
-                    topBanner: document.getElementById('topBanner').value,
-                    topBannerEnabled: document.getElementById('topBannerEnabled').checked,
-                    belowHero: document.getElementById('belowHero').value,
-                    belowHeroEnabled: document.getElementById('belowHeroEnabled').checked,
-                    inContent: document.getElementById('inContent').value,
-                    inContentEnabled: document.getElementById('inContentEnabled').checked,
-                    preDownload: document.getElementById('preDownload').value,
-                    preDownloadEnabled: document.getElementById('preDownloadEnabled').checked,
-                    footer: document.getElementById('footerAd').value,
-                    footerEnabled: document.getElementById('footerEnabled').checked,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert('✅ Ads settings saved!');
-            } catch (e) { alert('❌ Error: ' + e.message); }
-            return false;
+                    smartlink: document.getElementById('adsSmartlink').value.trim(),
+                    smartlinkEnabled: document.getElementById('adsSmartlinkEnabled').checked,
+                    externalLinkAd: document.getElementById('adsExternalLinkAd').value.trim(),
+                    externalLinkAdEnabled: document.getElementById('adsExternalLinkAdEnabled').checked,
+                    promoLink1: document.getElementById('adsPromoLink1').value.trim(),
+                    promoLink2: document.getElementById('adsPromoLink2').value.trim(),
+                    topBanner: document.getElementById('adsTopBanner').value.trim(),
+                    topBannerEnabled: document.getElementById('adsTopBannerEnabled').checked,
+                    belowHero: document.getElementById('adsBelowHero').value.trim(),
+                    belowHeroEnabled: document.getElementById('adsBelowHeroEnabled').checked,
+                    inContent: document.getElementById('adsInContent').value.trim(),
+                    inContentEnabled: document.getElementById('adsInContentEnabled').checked,
+                    preDownload: document.getElementById('adsPreDownload').value.trim(),
+                    preDownloadEnabled: document.getElementById('adsPreDownloadEnabled').checked,
+                    footer: document.getElementById('adsFooter').value.trim(),
+                    footerEnabled: document.getElementById('adsFooterEnabled').checked
+                }, { merge: true });
+                showToast('Ads settings saved!', 'success');
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
         }
-        
-        // ── Site Settings ─────────────────────────────────────────────────────
+
         async function loadSiteSettings() {
             try {
-                const doc = await db.collection('settings').doc('site').get();
+                var doc = await db.collection('settings').doc('site').get();
                 if (doc.exists) {
-                    const d = doc.data();
-                    document.getElementById('logoUrl').value = d.logo || '';
-                    document.getElementById('heroDescription').value = d.heroDescription || '';
-                    document.getElementById('announcementText').value = d.announcementText || '';
-                    document.getElementById('metaTitle').value = d.metaTitle || '';
-                    document.getElementById('metaDescription').value = d.metaDescription || '';
-                    document.getElementById('metaKeywords').value = d.metaKeywords || '';
+                    var d = doc.data();
+                    document.getElementById('siteLogo').value = d.logo || '';
+                    document.getElementById('siteHeroDesc').value = d.heroDescription || '';
+                    document.getElementById('siteAnnouncement').value = d.announcementText || '';
+                    document.getElementById('siteMetaDesc').value = d.metaDescription || '';
+                    document.getElementById('siteMetaKeywords').value = d.metaKeywords || '';
                 }
             } catch (e) { console.error(e); }
         }
-        
-        async function saveSettings(e) {
-            e.preventDefault();
+
+        async function saveSiteSettings() {
             try {
                 await db.collection('settings').doc('site').set({
-                    logo: document.getElementById('logoUrl').value,
-                    heroDescription: document.getElementById('heroDescription').value,
-                    announcementText: document.getElementById('announcementText').value,
-                    metaTitle: document.getElementById('metaTitle').value,
-                    metaDescription: document.getElementById('metaDescription').value,
-                    metaKeywords: document.getElementById('metaKeywords').value,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert('✅ Settings saved!');
-            } catch (e) { alert('❌ Error: ' + e.message); }
-            return false;
+                    logo: document.getElementById('siteLogo').value.trim(),
+                    heroDescription: document.getElementById('siteHeroDesc').value.trim(),
+                    announcementText: document.getElementById('siteAnnouncement').value.trim(),
+                    metaDescription: document.getElementById('siteMetaDesc').value.trim(),
+                    metaKeywords: document.getElementById('siteMetaKeywords').value.trim()
+                }, { merge: true });
+                showToast('Site settings saved!', 'success');
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
         }
-    </script>
-<script src="https://gfxgamerlab-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="34d50446-7157-4537-8e97-51d7ffc55e1d"></script></body>
+
+        async function loadAnalytics() {
+            try {
+                var today = new Date().toISOString().split('T')[0];
+                var currentMonth = new Date().toISOString().slice(0, 7);
+                var snap = await db.collection('analytics').get();
+                var todayVisits = 0, monthVisits = 0, totalVisits = 0, totalDownloads = 0;
+                var recentArr = [];
+                snap.forEach(function(doc) {
+                    var d = doc.data();
+                    if (d.type === 'visit') {
+                        if (doc.id === 'visits_' + today) todayVisits = d.count || 0;
+                        if (d.month === currentMonth && d.count) monthVisits += d.count;
+                        if (d.count) totalVisits += d.count;
+                        if (d.country && d.city && d.date) {
+                            recentArr.push({ country: d.country, city: d.city, date: d.date, source: d.source || 'Direct' });
+                        }
+                    }
+                    if (d.type === 'download') totalDownloads += (d.count || 0);
+                });
+                document.getElementById('anTodayVisits').textContent = todayVisits;
+                document.getElementById('anMonthVisits').textContent = monthVisits;
+                document.getElementById('anTotalVisits').textContent = totalVisits;
+                document.getElementById('anTotalDownloads').textContent = totalDownloads;
+                recentArr.sort(function(a, b) { return b.date > a.date ? 1 : -1; });
+                document.getElementById('recentVisits').innerHTML = recentArr.slice(0, 50).map(function(v) {
+                    return '<div class="visit-item"><span>' + escHtml(v.country) + ', ' + escHtml(v.city) + '</span><span>' + v.date + ' | ' + escHtml(v.source) + '</span></div>';
+                }).join('') || '<p style="color:var(--text-muted)">No visit data yet.</p>';
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadFeedbackAdmin() {
+            var container = document.getElementById('feedbackAdminList');
+            try {
+                var snap;
+                try { snap = await db.collection('feedback').orderBy('createdAt', 'desc').get(); }
+                catch (_) { snap = await db.collection('feedback').get(); }
+                if (snap.empty) {
+                    container.innerHTML = '<p style="color:var(--text-muted)">No feedback yet.</p>';
+                    return;
+                }
+                container.innerHTML = snap.docs.map(function(doc) {
+                    var f = doc.data();
+                    var id = doc.id;
+                    var stars = '';
+                    for (var i = 0; i < 5; i++) stars += i < (f.rating || 0) ? '&#9733;' : '&#9734;';
+                    var dateStr = '';
+                    if (f.createdAt) {
+                        var d;
+                        if (f.createdAt.toDate) d = f.createdAt.toDate();
+                        else if (f.createdAt.seconds) d = new Date(f.createdAt.seconds * 1000);
+                        if (d) dateStr = d.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    }
+                    var replyHtml = '';
+                    if (f.reply) {
+                        replyHtml = '<div class="feedback-existing-reply"><strong>GFX GAMER LAB replied:</strong><br>' + escHtml(f.reply) + '</div>';
+                    }
+                    return '<div class="feedback-admin-item">' +
+                        '<div class="feedback-admin-header">' +
+                        '<span class="feedback-admin-name">' + escHtml(f.name || 'Anonymous') + '</span>' +
+                        '<span class="feedback-admin-stars">' + stars + '</span>' +
+                        '</div>' +
+                        '<div class="feedback-admin-text">' + escHtml(f.text || '') + '</div>' +
+                        '<div class="feedback-admin-date">' + dateStr + '</div>' +
+                        '<div class="feedback-admin-actions">' +
+                        '<button class="btn ' + (f.liked ? 'btn-success' : 'btn-info') + '" onclick="toggleLikeFeedback(\'' + id + '\',' + !!f.liked + ')">' + (f.liked ? '&#10003; Liked' : '&#10084; Like') + '</button>' +
+                        '<button class="btn btn-info" onclick="showReplyBox(\'' + id + '\')">Reply</button>' +
+                        '<button class="btn btn-danger" onclick="deleteFeedback(\'' + id + '\')">Delete</button>' +
+                        '</div>' +
+                        '<div id="replyBox_' + id + '" class="feedback-reply-box" style="display:none;">' +
+                        '<input id="replyInput_' + id + '" placeholder="Type your reply..." value="' + escHtml(f.reply || '') + '">' +
+                        '<button class="btn btn-primary" onclick="saveReply(\'' + id + '\')">Send</button>' +
+                        '</div>' +
+                        replyHtml +
+                        '</div>';
+                }).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="color:var(--danger)">Error loading feedback.</p>';
+            }
+        }
+
+        function showReplyBox(id) {
+            var box = document.getElementById('replyBox_' + id);
+            box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        async function toggleLikeFeedback(id, currentlyLiked) {
+            try {
+                await db.collection('feedback').doc(id).update({ liked: !currentlyLiked });
+                showToast(currentlyLiked ? 'Like removed' : 'Liked!', 'success');
+                loadFeedbackAdmin();
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function saveReply(id) {
+            var reply = document.getElementById('replyInput_' + id).value.trim();
+            if (!reply) { showToast('Please type a reply!', 'error'); return; }
+            try {
+                await db.collection('feedback').doc(id).update({ reply: reply });
+                showToast('Reply saved!', 'success');
+                loadFeedbackAdmin();
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function deleteFeedback(id) {
+            if (!confirm('Delete this feedback?')) return;
+            try {
+                await db.collection('feedback').doc(id).delete();
+                showToast('Feedback deleted!', 'success');
+                loadFeedbackAdmin();
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+</body>
 </html>
